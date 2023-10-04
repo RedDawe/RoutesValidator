@@ -88,6 +88,10 @@ class MainActivity : ComponentActivity() {
             val suspectedRoutes = loadSuspectedRoutes(this)
             for (route in suspectedRoutes) {
                 val button = Button(this)
+                button.text = StringBuilder().append(route.origin)
+                    .append(" -> ")
+                    .append(route.destination)
+                    .toString()
                 suspectedRoutesView.addView(button)
                 button.setOnClickListener {
                     val gmmIntentUri =
