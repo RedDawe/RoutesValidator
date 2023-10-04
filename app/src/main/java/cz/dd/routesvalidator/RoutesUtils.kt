@@ -46,7 +46,9 @@ fun appendSuspectedRoute(route: Route) {
 fun loadSuspectedRoutes(): List<Route> {
     val routes = mutableListOf<Route>()
 
-    for (line in File(SUSPECTED_ROUTES_FILE_NAME).readLines()) {
+    val file = File(SUSPECTED_ROUTES_FILE_NAME)
+    if (!file.exists()) return emptyList()
+    for (line in file.readLines()) {
         val valueList = line.split(",")
         val waypoints = mutableListOf<Coordinate>()
         for (i in 4 until valueList.size) {

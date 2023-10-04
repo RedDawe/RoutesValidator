@@ -6,12 +6,23 @@ import cz.dd.routesvalidator.datamodel.Route
 private const val SAME_PLACE_THRESHOLD_DISTANCE_METERS = 50
 private const val IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD = 3
 
-class WaypointsManager() {
+class WaypointsManager private constructor() {
     private var currentWaypoint: Coordinate? = null
     private var currentWaypointOccurrences = 0
     private var isFirstWaypoint = true
     private var currentWaypoints: MutableList<Coordinate> = mutableListOf()
     private var lastPlaceOfStay: Coordinate? = null
+
+    companion object {
+
+        @Volatile
+        private var instance: WaypointsManager? = null
+
+        fun getInstance() =
+            instance ?: synchronized(this) {
+                instance ?: WaypointsManager().also { instance = it }
+            }
+    }
 
     fun processWaypoint(waypoint: Coordinate): Route? {
         var result: Route? = null

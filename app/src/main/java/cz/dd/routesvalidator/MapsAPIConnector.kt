@@ -9,10 +9,21 @@ import com.google.maps.model.Unit
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 
-class MapsAPIConnector: AutoCloseable {
+class MapsAPIConnector private constructor(): AutoCloseable {
     private val context: GeoApiContext = GeoApiContext.Builder()
         .apiKey(BuildConfig.GOOGLE_MAPS_API_KEY)
         .build()
+
+    companion object {
+
+        @Volatile
+        private var instance: MapsAPIConnector? = null
+
+        fun getInstance() =
+            instance ?: synchronized(this) {
+                instance ?: MapsAPIConnector().also { instance = it }
+            }
+    }
 
     fun fetchOptimalWaypointsForRoute(route: Route): List<Coordinate> {
         val directionsResult = fetchOptimalDirection(route)

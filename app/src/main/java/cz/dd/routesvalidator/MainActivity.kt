@@ -18,6 +18,7 @@ import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -33,8 +34,6 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var trackingSwitch: Switch
-    val waypointsManager = WaypointsManager()
-    private val mapsAPIConnector = MapsAPIConnector()
 
     private fun explanationMessage(permission: String): String {
         if (permission.equals(Manifest.permission.ACCESS_COARSE_LOCATION)) {
@@ -74,8 +73,7 @@ class MainActivity : ComponentActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        val captureLocationRequest = PeriodicWorkRequestBuilder<CaptureLocationWorker>(10, TimeUnit.SECONDS)
-            .addTag(CAPTURE_LOCATION_REQUEST_TAG)
+        val captureLocationRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
             .build()
         val workManager = WorkManager.getInstance(this)
 
@@ -87,7 +85,7 @@ class MainActivity : ComponentActivity() {
                 }
             } else {
                 workManager.cancelAllWorkByTag(CAPTURE_LOCATION_REQUEST_TAG)
-                waypointsManager.finishAddingWaypoints()
+                WaypointsManager.getInstance().finishAddingWaypoints()
             }
         }
     }
@@ -111,25 +109,6 @@ class MainActivity : ComponentActivity() {
 
                 }
             }
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun captureLocation() {
-        if (!doPermission()) return // TODO: try removing permissions after switching switch
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            if (location != null) {
-                val potentialRoute = waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude))
-                if (potentialRoute != null) {
-                    capturedNewRoute(potentialRoute)
-                }
-            }
-        }
-    }
-
-    fun capturedNewRoute(route: Route) {
-        if (isRouteShortest(route, mapsAPIConnector.fetchOptimalWaypointsForRoute(route))) {
-            appendSuspectedRoute(route)
         }
     }
 }
