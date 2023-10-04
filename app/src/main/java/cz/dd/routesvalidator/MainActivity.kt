@@ -93,6 +93,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+
+        if (hasFocus) {
+            // reload maps open buttons
+        }
+    }
+
     private fun captureLocation() {
         if (!doPermission()) return // TODO: try removing permissions after switching switch
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->

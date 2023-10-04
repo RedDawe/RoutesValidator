@@ -11,7 +11,7 @@ import kotlin.math.sqrt
 private const val SAME_PLACE_THRESHOLD_DISTANCE_METERS = 50
 private const val IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD = 3
 
-class WaypointsManager {
+class WaypointsManager(private val routesManager: RoutesManager) {
     private var currentWaypoint: Coordinate? = null
     private var currentWaypointOccurrences = 0
     private var isFirstWaypoint = true
@@ -42,6 +42,7 @@ class WaypointsManager {
 
         } else {
             routes.add(Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints))
+            routesManager.capturedNewRoute(routes[routes.size - 1])
             currentWaypoints = mutableListOf()
             lastPlaceOfStay = currentWaypointImmutableCopy
             currentWaypointOccurrences = 1
@@ -55,7 +56,8 @@ class WaypointsManager {
         val currentWaypointImmutableCopy = currentWaypoint
         val lastPlaceOfStayImmutableCopy = lastPlaceOfStay
         if (currentWaypointImmutableCopy == null || lastPlaceOfStayImmutableCopy == null) return
-        routes.add(Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints))
+        routes.add(Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints)) // TODO: reset routes
+        routesManager.capturedNewRoute(routes[routes.size - 1])
 
         currentWaypoint = null
         currentWaypointOccurrences = 0

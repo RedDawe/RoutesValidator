@@ -11,7 +11,7 @@ import cz.dd.routesvalidator.datamodel.Route
 
 class MapsAPIConnector: AutoCloseable {
     private val context: GeoApiContext = GeoApiContext.Builder()
-        .apiKey("")
+        .apiKey(BuildConfig.GOOGLE_MAPS_API_KEY)
         .build()
 
     fun fetchOptimalWaypointsForRoute(route: Route): List<Coordinate> {

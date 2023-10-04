@@ -1,6 +1,10 @@
+val GOOGLE_MAPS_API_KEY: String by project
+android.buildFeatures.buildConfig = true
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -18,6 +22,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "GOOGLE_MAPS_API_KEY", "\"${GOOGLE_MAPS_API_KEY}\"")
     }
 
     buildTypes {
@@ -61,6 +67,8 @@ dependencies {
     implementation("androidx.activity:activity:1.7.2")
     implementation("androidx.fragment:fragment:1.6.1")
     implementation("com.android.volley:volley:1.2.1")
+    implementation("com.google.maps:google-maps-services:2.2.0")
+    implementation("org.slf4j:slf4j-simple:2.0.9")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testImplementation("org.assertj:assertj-core:3.11.1")
