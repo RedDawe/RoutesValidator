@@ -1,6 +1,7 @@
 package cz.dd.routesvalidator
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,22 +10,31 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.SyncStateContract.Constants
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Switch
 import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import cz.dd.routesvalidator.datamodel.Coordinate
+import cz.dd.routesvalidator.datamodel.Route
 import java.time.Duration
+import java.util.concurrent.TimeUnit
 
+private const val CAPTURE_LOCATION_REQUEST_TAG = "CAPTURE_LOCATION_REQUEST_TAG"
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var trackingSwitch: Switch
-    private val waypoints = mutableListOf<Coordinate>()
+    val waypointsManager = WaypointsManager()
+    private val mapsAPIConnector = MapsAPIConnector()
 
     private fun explanationMessage(permission: String): String {
         if (permission.equals(Manifest.permission.ACCESS_COARSE_LOCATION)) {
@@ -63,32 +73,21 @@ class MainActivity : ComponentActivity() {
         setContentView(R.layout.activity_main)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = object : Runnable {
-            override fun run() {
-                captureLocation()
-                handler.postDelayed(this, Duration.ofMinutes(1).toMillis())
-            }
-        }
+
+        val captureLocationRequest = PeriodicWorkRequestBuilder<CaptureLocationWorker>(10, TimeUnit.SECONDS)
+            .addTag(CAPTURE_LOCATION_REQUEST_TAG)
+            .build()
+        val workManager = WorkManager.getInstance(this)
 
         trackingSwitch = findViewById<Switch>(R.id.trackingSwitch)
         trackingSwitch.setOnCheckedChangeListener { view, isChecked ->
             if (isChecked) {
-                if (doPermission())
-                    runnable.run()
-            } else {
-                handler.removeCallbacks(runnable)
-
-                val notMatchingRoutesLayout = findViewById<LinearLayout>(R.id.notMatchingRoutes)
-                val button = Button(this)
-                notMatchingRoutesLayout.addView(button)
-                button.setOnClickListener {
-                    val gmmIntentUri =
-                        Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + "20.344,34.34" + "&destination=" + "20.5666,45.345" + "&travelmode=transit")
-                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                    startActivity(mapIntent)
-
+                if (doPermission()) {
+                    workManager.enqueue(captureLocationRequest)
                 }
+            } else {
+                workManager.cancelAllWorkByTag(CAPTURE_LOCATION_REQUEST_TAG)
+                waypointsManager.finishAddingWaypoints()
             }
         }
     }
@@ -97,16 +96,40 @@ class MainActivity : ComponentActivity() {
         super.onWindowFocusChanged(hasFocus)
 
         if (hasFocus) {
-            // reload maps open buttons
+            val suspectedRoutesView = findViewById<LinearLayout>(R.id.suspectedRoutes)
+            suspectedRoutesView.removeAllViews()
+
+            val suspectedRoutes = loadSuspectedRoutes()
+            for (route in suspectedRoutes) {
+                val button = Button(this)
+                suspectedRoutesView.addView(button)
+                button.setOnClickListener {
+                    val gmmIntentUri =
+                        Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + route.origin + "&destination=" + route.destination + "&travelmode=transit")
+                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                    startActivity(mapIntent)
+
+                }
+            }
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun captureLocation() {
         if (!doPermission()) return // TODO: try removing permissions after switching switch
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
-                waypoints.add(Coordinate(location.latitude, location.longitude))
+                val potentialRoute = waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude))
+                if (potentialRoute != null) {
+                    capturedNewRoute(potentialRoute)
+                }
             }
+        }
+    }
+
+    fun capturedNewRoute(route: Route) {
+        if (isRouteShortest(route, mapsAPIConnector.fetchOptimalWaypointsForRoute(route))) {
+            appendSuspectedRoute(route)
         }
     }
 }

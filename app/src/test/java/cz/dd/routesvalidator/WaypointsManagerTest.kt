@@ -96,13 +96,18 @@ class WaypointsManagerTest {
 
     @Test
     fun extract() {
-        for ((capturedWaypoints, correctRoutes) in waypointsRoutesTestValues) {
+        for ((capturedWaypoints, expectedRoutes) in waypointsRoutesTestValues) {
+            val routes = mutableListOf<Route>()
+
             val waypointsManager = WaypointsManager()
             for (capturedWaypoint in capturedWaypoints) {
-                waypointsManager.addWaypoint(capturedWaypoint)
+                val potentialRoute = waypointsManager.processWaypoint(capturedWaypoint)
+                if (potentialRoute != null) routes.add(potentialRoute)
             }
-            waypointsManager.finishAddingWaypoints()
-            assertThat(waypointsManager.routes).isEqualToComparingFieldByFieldRecursively(correctRoutes)
+            val potentialRoute = waypointsManager.finishAddingWaypoints()
+            if (potentialRoute != null) routes.add(potentialRoute)
+
+            assertThat(routes).isEqualToComparingFieldByFieldRecursively(expectedRoutes)
         }
     }
 }

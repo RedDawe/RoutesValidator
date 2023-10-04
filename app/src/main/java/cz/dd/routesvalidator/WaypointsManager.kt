@@ -2,24 +2,20 @@ package cz.dd.routesvalidator
 
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
-import kotlin.math.asin
-import kotlin.math.cos
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 private const val SAME_PLACE_THRESHOLD_DISTANCE_METERS = 50
 private const val IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD = 3
 
-class WaypointsManager(private val routesManager: RoutesManager) {
+class WaypointsManager() {
     private var currentWaypoint: Coordinate? = null
     private var currentWaypointOccurrences = 0
     private var isFirstWaypoint = true
     private var currentWaypoints: MutableList<Coordinate> = mutableListOf()
     private var lastPlaceOfStay: Coordinate? = null
-    val routes: MutableList<Route> = mutableListOf()
 
-    fun addWaypoint(waypoint: Coordinate) {
+    fun processWaypoint(waypoint: Coordinate): Route? {
+        var result: Route? = null
+
         val currentWaypointImmutableCopy = currentWaypoint
         val lastPlaceOfStayImmutableCopy = lastPlaceOfStay
         if (currentWaypointImmutableCopy == null) {
@@ -41,8 +37,7 @@ class WaypointsManager(private val routesManager: RoutesManager) {
             assert(currentWaypoints.isEmpty())
 
         } else {
-            routes.add(Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints))
-            routesManager.capturedNewRoute(routes[routes.size - 1])
+            result = Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints)
             currentWaypoints = mutableListOf()
             lastPlaceOfStay = currentWaypointImmutableCopy
             currentWaypointOccurrences = 1
@@ -50,20 +45,22 @@ class WaypointsManager(private val routesManager: RoutesManager) {
 
         }
         currentWaypoint = waypoint
+        return result
     }
 
-    fun finishAddingWaypoints() {
+    fun finishAddingWaypoints(): Route? {
         val currentWaypointImmutableCopy = currentWaypoint
         val lastPlaceOfStayImmutableCopy = lastPlaceOfStay
-        if (currentWaypointImmutableCopy == null || lastPlaceOfStayImmutableCopy == null) return
-        routes.add(Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints)) // TODO: reset routes
-        routesManager.capturedNewRoute(routes[routes.size - 1])
+        if (currentWaypointImmutableCopy == null || lastPlaceOfStayImmutableCopy == null) return null
+        val result = Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints)
 
         currentWaypoint = null
         currentWaypointOccurrences = 0
         isFirstWaypoint = true
         currentWaypoints = mutableListOf()
         lastPlaceOfStay = null
+
+        return result
     }
 
     private fun areTheSamePlace(placeA: Coordinate, placeB: Coordinate): Boolean {

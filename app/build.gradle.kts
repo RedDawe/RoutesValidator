@@ -69,6 +69,7 @@ dependencies {
     implementation("com.android.volley:volley:1.2.1")
     implementation("com.google.maps:google-maps-services:2.2.0")
     implementation("org.slf4j:slf4j-simple:2.0.9")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testImplementation("org.assertj:assertj-core:3.11.1")
