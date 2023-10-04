@@ -60,6 +60,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("androidx.activity:activity:1.7.2")
     implementation("androidx.fragment:fragment:1.6.1")
+    implementation("com.android.volley:volley:1.2.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testImplementation("org.assertj:assertj-core:3.11.1")

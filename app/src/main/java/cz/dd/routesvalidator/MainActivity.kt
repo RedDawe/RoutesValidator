@@ -16,6 +16,7 @@ import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import cz.dd.routesvalidator.datamodel.Coordinate
 import java.time.Duration
 
 
@@ -23,7 +24,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var trackingSwitch: Switch
-    private val waypoints = mutableListOf<Coordinates>()
+    private val waypoints = mutableListOf<Coordinate>()
 
     private fun explanationMessage(permission: String): String {
         if (permission.equals(Manifest.permission.ACCESS_COARSE_LOCATION)) {
@@ -96,7 +97,7 @@ class MainActivity : ComponentActivity() {
         if (!doPermission()) return // TODO: try removing permissions after switching switch
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
-                waypoints.add(Coordinates(location.latitude, location.longitude))
+                waypoints.add(Coordinate(location.latitude, location.longitude))
             }
         }
     }
