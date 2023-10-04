@@ -65,16 +65,20 @@ class WaypointsManager private constructor() {
         if (currentWaypointImmutableCopy == null || lastPlaceOfStayImmutableCopy == null) return null
         val result = Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints)
 
-        currentWaypoint = null
-        currentWaypointOccurrences = 0
-        isFirstWaypoint = true
-        currentWaypoints = mutableListOf()
-        lastPlaceOfStay = null
+        reset()
 
         return result
     }
 
     private fun areTheSamePlace(placeA: Coordinate, placeB: Coordinate): Boolean {
         return calculateDistanceKilometers(placeA, placeB) * 1000 < SAME_PLACE_THRESHOLD_DISTANCE_METERS
+    }
+
+    fun reset() {
+        currentWaypoint = null
+        currentWaypointOccurrences = 0
+        isFirstWaypoint = true
+        currentWaypoints = mutableListOf()
+        lastPlaceOfStay = null
     }
 }

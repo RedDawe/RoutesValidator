@@ -1,38 +1,25 @@
 package cz.dd.routesvalidator
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.provider.SyncStateContract.Constants
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Switch
 import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import cz.dd.routesvalidator.datamodel.Coordinate
-import cz.dd.routesvalidator.datamodel.Route
-import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 private const val CAPTURE_LOCATION_REQUEST_TAG = "CAPTURE_LOCATION_REQUEST_TAG"
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var trackingSwitch: Switch
 
     private fun explanationMessage(permission: String): String {
@@ -71,20 +58,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        val captureLocationRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
-            .build()
-        val workManager = WorkManager.getInstance(this)
+        resetFile(this)
 
         trackingSwitch = findViewById<Switch>(R.id.trackingSwitch)
         trackingSwitch.setOnCheckedChangeListener { view, isChecked ->
             if (isChecked) {
                 if (doPermission()) {
-                    workManager.enqueue(captureLocationRequest)
+                    WaypointsManager.getInstance().reset()
+                    val locationCaptureRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
+                        .build()
+                    LocationCapturingManager.getInstance().keepCapturing = true
+                    WorkManager.getInstance(this).enqueue(locationCaptureRequest)
                 }
             } else {
-                workManager.cancelAllWorkByTag(CAPTURE_LOCATION_REQUEST_TAG)
+                // TODO: capture 1 last time
+                LocationCapturingManager.getInstance().keepCapturing = false
                 WaypointsManager.getInstance().finishAddingWaypoints()
             }
         }
@@ -97,7 +85,7 @@ class MainActivity : ComponentActivity() {
             val suspectedRoutesView = findViewById<LinearLayout>(R.id.suspectedRoutes)
             suspectedRoutesView.removeAllViews()
 
-            val suspectedRoutes = loadSuspectedRoutes()
+            val suspectedRoutes = loadSuspectedRoutes(this)
             for (route in suspectedRoutes) {
                 val button = Button(this)
                 suspectedRoutesView.addView(button)

@@ -1,5 +1,7 @@
 package cz.dd.routesvalidator
 
+import android.app.Application
+import android.content.Context
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 import java.io.File
@@ -38,18 +40,30 @@ fun calculateDistanceKilometers(placeA: Coordinate, placeB: Coordinate): Double 
     return 2 * EARTH_RADIUS * asin(sqrt(haversine))
 }
 
-fun appendSuspectedRoute(route: Route) {
-    val suspectedRoutes = File(SUSPECTED_ROUTES_FILE_NAME)
-    suspectedRoutes.appendText(route.csvString())
+fun appendSuspectedRoute(route: Route, context: Context) {
+    val existingSuspectedRoutes = loadSuspectedRoutes(context)
+
+    context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
+        for (existingSuspectingRoute in existingSuspectedRoutes) {
+            it.write(existingSuspectingRoute.csvString().toByteArray())
+        }
+        it.write(route.csvString().toByteArray())
+    }
 }
 
-fun loadSuspectedRoutes(): List<Route> {
-    val routes = mutableListOf<Route>()
+fun resetFile(context: Context) {
+    context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
+        it.write(System.lineSeparator().toByteArray())
+    }
+}
 
-    val file = File(SUSPECTED_ROUTES_FILE_NAME)
-    if (!file.exists()) return emptyList()
-    for (line in file.readLines()) {
-        val valueList = line.split(",")
+fun loadSuspectedRoutes(context: Context): List<Route> {
+    if (!context.fileList().contains(SUSPECTED_ROUTES_FILE_NAME)) return emptyList()
+
+    val routes = mutableListOf<Route>()
+    for (line in context.openFileInput(SUSPECTED_ROUTES_FILE_NAME).bufferedReader().readLines()) {
+        if (line.isBlank()) return emptyList()
+        val valueList = line.trim().split(",")
         val waypoints = mutableListOf<Coordinate>()
         for (i in 4 until valueList.size) {
             waypoints.add(Coordinate(valueList[i].toDouble(), valueList[i + 1].toDouble()))

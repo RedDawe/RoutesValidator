@@ -18,13 +18,14 @@ class CaptureLocationWorker(private val context: Context, private val workerPara
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
     override suspend fun doWork(): Result {
-        val nextLocationCapture: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
-            .setInitialDelay(10, TimeUnit.SECONDS)
-            .build()
-        WorkManager.getInstance(context).enqueue(nextLocationCapture)
+        if (LocationCapturingManager.getInstance().keepCapturing) {
+            val nextLocationCapture: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
+                .setInitialDelay(10, TimeUnit.SECONDS)
+                .build()
+            WorkManager.getInstance(context).enqueue(nextLocationCapture)
 
-        captureLocation()
-
+            captureLocation()
+        }
         return Result.success()
     }
 
@@ -36,7 +37,9 @@ class CaptureLocationWorker(private val context: Context, private val workerPara
             if (location != null) {
                 val potentialRoute = WaypointsManager.getInstance().processWaypoint(Coordinate(location.latitude, location.longitude))
                 if (potentialRoute != null && !isRouteShortest(potentialRoute, MapsAPIConnector.getInstance().fetchOptimalWaypointsForRoute(potentialRoute))) {
-                    appendSuspectedRoute(potentialRoute)
+                    if (LocationCapturingManager.getInstance().keepCapturing) {
+                        appendSuspectedRoute(potentialRoute, context)
+                    }
                 }
             }
         }

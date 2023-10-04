@@ -11,6 +11,7 @@ class Route (val origin: Coordinate, val destination: Coordinate, val waypoints:
             stringBuilder.append(",")
             stringBuilder.append(waypoint)
         }
+        stringBuilder.append(System.lineSeparator())
         return stringBuilder.toString()
     }
 }
