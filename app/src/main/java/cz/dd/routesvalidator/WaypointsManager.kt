@@ -10,19 +10,6 @@ import kotlin.math.sqrt
 
 private const val SAME_PLACE_THRESHOLD_DISTANCE_METERS = 50
 private const val IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD = 3
-private const val EARTH_RADIUS = 6371
-
-fun calculateDistanceKilometers(placeA: Coordinate, placeB: Coordinate): Double {
-    val changeInLatitude = Math.toRadians(placeB.latitude - placeA.latitude)
-    val changeInLongitude = Math.toRadians(placeB.longitude - placeA.longitude)
-
-    val haversine = sin(changeInLatitude / 2).pow(2.0) +
-            sin(changeInLongitude / 2).pow(2.0) *
-            cos(Math.toRadians(placeA.latitude)) *
-            cos(Math.toRadians(placeB.latitude))
-
-    return 2 * EARTH_RADIUS * asin(sqrt(haversine))
-}
 
 class WaypointsManager {
     private var currentWaypoint: Coordinate? = null
