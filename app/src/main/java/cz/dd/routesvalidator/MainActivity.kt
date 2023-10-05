@@ -23,14 +23,19 @@ class MainActivity : ComponentActivity() {
     private lateinit var trackingSwitch: Switch
 
     private fun explanationMessage(permission: String): String {
+        val baseMessage = """
+            The main purpose of the app is tracking your movement throughout the day. For that reason we need your
+            location. We are now going to ask you for the permissions necessary to access your location.
+        """.trimIndent() + System.lineSeparator() + System.lineSeparator()
+
         if (permission.equals(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            return "Please click \"While using the app\", otherwise the app cannot function, then turn the tracking switch back on again"
+            return baseMessage + "Please click \"While using the app\", otherwise the app cannot function, then turn the tracking switch back on again"
         }
         if (permission.equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            return "Please click \"Change to precise location\", otherwise the app cannot function, then turn the tracking switch back on again"
+            return baseMessage + "Please click \"Change to precise location\", otherwise the app cannot function, then turn the tracking switch back on again"
         }
         if (permission.equals(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-            return "Please click \"Allow all the time\" and then come back to the app, otherwise the app cannot function, then turn the tracking switch back on again"
+            return baseMessage + "Please click \"Allow all the time\" and then come back to the app, otherwise the app cannot function, then turn the tracking switch back on again"
         }
         return ""
     }
