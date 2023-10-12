@@ -1,10 +1,8 @@
 package cz.dd.routesvalidator
 
-import android.app.Application
 import android.content.Context
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
-import java.io.File
 import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.pow
@@ -12,8 +10,6 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 private const val SUSPECTED_ROUTES_FILE_NAME = "suspectedRoutes.csv"
-private const val SAME_WAYPOINT_THRESHOLD_DISTANCE_METERS = 20
-private const val EARTH_RADIUS = 6371
 
 fun isRouteShortest(route: Route, optimalWaypoints: List<Coordinate>): Boolean {
     for (optimalWaypoint in optimalWaypoints) {
@@ -37,7 +33,7 @@ fun calculateDistanceKilometers(placeA: Coordinate, placeB: Coordinate): Double 
             cos(Math.toRadians(placeA.latitude)) *
             cos(Math.toRadians(placeB.latitude))
 
-    return 2 * EARTH_RADIUS * asin(sqrt(haversine))
+    return 2 * EARTH_RADIUS_KILOMETERS * asin(sqrt(haversine))
 }
 
 fun appendSuspectedRoute(route: Route, context: Context) {

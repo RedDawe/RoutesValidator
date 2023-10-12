@@ -10,17 +10,15 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.LocationServices
 import cz.dd.routesvalidator.datamodel.Coordinate
-import java.util.concurrent.TimeUnit
 
-
-class CaptureLocationWorker(private val context: Context, private val workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class CaptureLocationWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
     override suspend fun doWork(): Result {
         if (LocationCapturingManager.getInstance().keepCapturing) {
             val nextLocationCapture: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
-                .setInitialDelay(10, TimeUnit.SECONDS)
+                .setInitialDelay(WAYPOINT_LOCATION_CAPTURE_DELAY)
                 .build()
             WorkManager.getInstance(context).enqueue(nextLocationCapture)
 

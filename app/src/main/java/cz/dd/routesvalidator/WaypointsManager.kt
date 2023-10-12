@@ -3,9 +3,6 @@ package cz.dd.routesvalidator
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 
-private const val SAME_PLACE_THRESHOLD_DISTANCE_METERS = 50
-private const val IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD = 3
-
 class WaypointsManager private constructor() {
     private var currentWaypoint: Coordinate? = null
     private var currentWaypointOccurrences = 0
@@ -18,10 +15,16 @@ class WaypointsManager private constructor() {
         @Volatile
         private var instance: WaypointsManager? = null
 
-        fun getInstance() =
-            instance ?: synchronized(this) {
-                instance ?: WaypointsManager().also { instance = it }
+        fun getInstance(): WaypointsManager { // TODO: dont do javascript fun defiinition?
+            return synchronized(this) { // TODO: only checck when synced
+                instance ?: WaypointsManager().also { instance = it } // TODO: rewrite in Java like code?
             }
+        }
+
+        fun getInstance(test: Boolean): WaypointsManager {
+            if (!test) return getInstance()
+            return WaypointsManager()
+        }
     }
 
     fun processWaypoint(waypoint: Coordinate): Route? {
@@ -32,6 +35,7 @@ class WaypointsManager private constructor() {
         if (currentWaypointImmutableCopy == null) {
             currentWaypointOccurrences = 1
             assert(isFirstWaypoint)
+            currentWaypoint = waypoint
 
         } else if (areTheSamePlace(waypoint, currentWaypointImmutableCopy)) {
             currentWaypointOccurrences++
@@ -40,12 +44,14 @@ class WaypointsManager private constructor() {
             currentWaypoints.add(currentWaypointImmutableCopy)
             currentWaypointOccurrences = 1
             isFirstWaypoint = false
+            currentWaypoint = waypoint
 
         } else if (lastPlaceOfStayImmutableCopy == null) {
             lastPlaceOfStay = currentWaypointImmutableCopy
             currentWaypointOccurrences = 1
             isFirstWaypoint = false
             assert(currentWaypoints.isEmpty())
+            currentWaypoint = waypoint
 
         } else {
             result = Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints)
@@ -53,9 +59,9 @@ class WaypointsManager private constructor() {
             lastPlaceOfStay = currentWaypointImmutableCopy
             currentWaypointOccurrences = 1
             isFirstWaypoint = false
+            currentWaypoint = waypoint
 
         }
-        currentWaypoint = waypoint
         return result
     }
 
@@ -71,7 +77,7 @@ class WaypointsManager private constructor() {
     }
 
     private fun areTheSamePlace(placeA: Coordinate, placeB: Coordinate): Boolean {
-        return calculateDistanceKilometers(placeA, placeB) * 1000 < SAME_PLACE_THRESHOLD_DISTANCE_METERS
+        return calculateDistanceKilometers(placeA, placeB) * 1000 < SAME_PLACE_OF_STAY_THRESHOLD_DISTANCE_METERS
     }
 
     fun reset() {

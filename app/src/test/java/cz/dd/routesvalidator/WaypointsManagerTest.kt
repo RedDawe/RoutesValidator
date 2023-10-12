@@ -29,35 +29,35 @@ val waypointsRoutesTestValues = listOf(
     Pair(listOf(a, b), listOf(Route(a, b, emptyList()))),
     Pair(listOf(a, b, d), listOf(Route(a, d, listOf(b)))),
     Pair(listOf(a, b, b, b, d), listOf(Route(a, b, emptyList()), Route(b, d, emptyList()))),
-    Pair(listOf(a, c1, c2, d, b, b, b, d), listOf(Route(a, b, listOf(c2, d)), Route(b, d, emptyList()))),
+    Pair(listOf(a, c1, c2, d, b, b, b, d), listOf(Route(a, b, listOf(c1, d)), Route(b, d, emptyList()))),
     Pair(
         listOf(a, c1, c2, d, b, b, b, c1, a, c2, d, d, d, a, b),
-        listOf(Route(a, b, listOf(c2, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
+        listOf(Route(a, b, listOf(c1, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
     ),
     Pair(
         listOf(a, c1, c2, d, b, b, b, c1, a, c2, d, d, d, a, b, b, b),
-        listOf(Route(a, b, listOf(c2, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
+        listOf(Route(a, b, listOf(c1, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
     ),
     Pair(
         listOf(a, c1, c2, d, b, b, b, c1, a, c2, d, d, d, a, b, b, b, b),
-        listOf(Route(a, b, listOf(c2, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
+        listOf(Route(a, b, listOf(c1, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
     ),
     Pair(
         listOf(a, c1, c2, d, b, b, b, c1, a, c2, d, d, d, a, b, b, b, b, b),
-        listOf(Route(a, b, listOf(c2, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
+        listOf(Route(a, b, listOf(c1, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
     ),
     Pair(
         listOf(a, c1, c2, d, b, b, b, c1, a, c2, d, d, d, d, a, b, b, b, b, b),
-        listOf(Route(a, b, listOf(c2, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
+        listOf(Route(a, b, listOf(c1, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
     ),
     Pair(
         listOf(a, c1, c2, d, b, b, b, c1, a, c2, d, d, d, d, d, a, b, b, b, b, b),
-        listOf(Route(a, b, listOf(c2, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
+        listOf(Route(a, b, listOf(c1, d)), Route(b, d, listOf(c1, a, c2)), Route(d, b, listOf(a)))
     ),
     Pair(
         listOf(a, c1, c2, d, b, b, b, c1, a, c2, d, d, d, d, d, a, b, b, b, b, b, d),
         listOf(
-            Route(a, b, listOf(c2, d)),
+            Route(a, b, listOf(c1, d)),
             Route(b, d, listOf(c1, a, c2)),
             Route(d, b, listOf(a)),
             Route(b, d, emptyList())
@@ -66,7 +66,7 @@ val waypointsRoutesTestValues = listOf(
     Pair(
         listOf(a, c1, c2, d, b, b, b, c1, a, c2, d, d, d, d, d, a, b, b, b, b, b, d, d, d, b),
         listOf(
-            Route(a, b, listOf(c2, d)),
+            Route(a, b, listOf(c1, d)),
             Route(b, d, listOf(c1, a, c2)),
             Route(d, b, listOf(a)),
             Route(b, d, emptyList()),
@@ -74,12 +74,12 @@ val waypointsRoutesTestValues = listOf(
         )
     ),
     Pair(listOf(a, b, a, b, a, b), listOf(Route(a, b, listOf(b, a, b, a)))),
-    Pair(listOf(c1, c2, d), listOf(Route(c2, d, emptyList()))),
-    Pair(listOf(d, c1, c2), listOf(Route(d, c2, emptyList()))),
+    Pair(listOf(c1, c2, d), listOf(Route(c1, d, emptyList()))), // TODO: when it come to places, it always has to be relative to the first 1
+    Pair(listOf(d, c1, c2), listOf(Route(d, c1, emptyList()))),
     Pair(listOf(a, c1, c2, c1, d), listOf(Route(a, c1, emptyList()), Route(c1, d, emptyList()))),
-    Pair(listOf(a, c1, c1, c2, d), listOf(Route(a, c2, emptyList()), Route(c2, d, emptyList()))),
-    Pair(listOf(a, c2, c2, c1, d), listOf(Route(a, c1, emptyList()), Route(c1, d, emptyList()))),
-    Pair(listOf(a, b, c1, c1, c2, a, b, d), listOf(Route(a, c2, listOf(b)), Route(c2, d, listOf(a, b))))
+    Pair(listOf(a, c1, c1, c2, d), listOf(Route(a, c1, emptyList()), Route(c1, d, emptyList()))),
+    Pair(listOf(a, c2, c2, c1, d), listOf(Route(a, c2, emptyList()), Route(c2, d, emptyList()))),
+    Pair(listOf(a, b, c1, c1, c2, a, b, d), listOf(Route(a, c1, listOf(b)), Route(c1, d, listOf(a, b))))
 )
 
 class WaypointsManagerTest {
@@ -99,7 +99,7 @@ class WaypointsManagerTest {
         for ((capturedWaypoints, expectedRoutes) in waypointsRoutesTestValues) {
             val routes = mutableListOf<Route>()
 
-            val waypointsManager = WaypointsManager()
+            val waypointsManager = WaypointsManager.getInstance(true)
             for (capturedWaypoint in capturedWaypoints) {
                 val potentialRoute = waypointsManager.processWaypoint(capturedWaypoint)
                 if (potentialRoute != null) routes.add(potentialRoute)
