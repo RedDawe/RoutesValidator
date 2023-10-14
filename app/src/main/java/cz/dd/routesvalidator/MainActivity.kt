@@ -91,7 +91,7 @@ class MainActivity : ComponentActivity() {
             suspectedRoutesView.removeAllViews()
 
             val suspectedRoutes = loadSuspectedRoutes(this)
-            for (route in suspectedRoutes) {
+            for (route in suspectedRoutes) { // TOOD: delete button
                 val button = Button(this)
                 button.text = StringBuilder().append(route.origin)
                     .append(" -> ")
