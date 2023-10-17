@@ -2,19 +2,27 @@ package cz.dd.routesvalidator
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.VectorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Switch
 import androidx.activity.ComponentActivity
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material3.Icon
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 
 private const val CAPTURE_LOCATION_REQUEST_TAG = "CAPTURE_LOCATION_REQUEST_TAG"
 
@@ -91,20 +99,30 @@ class MainActivity : ComponentActivity() {
             suspectedRoutesView.removeAllViews()
 
             val suspectedRoutes = loadSuspectedRoutes(this)
-            for (route in suspectedRoutes) { // TOOD: delete button
-                val button = Button(this)
-                button.text = StringBuilder().append(route.origin)
+            for (route in suspectedRoutes) {
+                val buttonsPair = LinearLayout(this)
+                buttonsPair.orientation = LinearLayout.HORIZONTAL
+                suspectedRoutesView.addView(buttonsPair)
+
+                val openMapsButton = Button(this)
+                openMapsButton.text = StringBuilder().append(route.origin.latitude)
                     .append(" -> ")
-                    .append(route.destination)
+//                    .append(route.destination)
                     .toString()
-                suspectedRoutesView.addView(button)
-                button.setOnClickListener {
+                openMapsButton.setOnClickListener {
                     val gmmIntentUri =
                         Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + route.origin + "&destination=" + route.destination + "&travelmode=transit")
                     val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                     startActivity(mapIntent)
-
                 }
+                buttonsPair.addView(openMapsButton)
+
+                val deleteButton = ImageButton(this)
+                deleteButton.setImageResource(R.drawable.delete)
+                deleteButton.setOnClickListener {
+                    suspectedRoutesView.removeView(buttonsPair)
+                }
+                buttonsPair.addView(deleteButton)
             }
         }
     }

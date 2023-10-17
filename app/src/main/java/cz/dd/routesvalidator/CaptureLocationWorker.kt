@@ -10,6 +10,8 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.LocationServices
 import cz.dd.routesvalidator.datamodel.Coordinate
+import cz.dd.routesvalidator.datamodel.Route
+import kotlin.random.Random
 
 class CaptureLocationWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
