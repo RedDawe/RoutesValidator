@@ -91,7 +91,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
+    override fun onWindowFocusChanged(hasFocus: Boolean) { // TODO: also call on stop tracking/ add route or smth
         super.onWindowFocusChanged(hasFocus)
 
         if (hasFocus) {
