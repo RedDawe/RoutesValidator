@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
                 val openMapsButton = Button(this)
                 openMapsButton.text = StringBuilder().append(route.origin.latitude)
                     .append(" -> ")
-//                    .append(route.destination)
+//                    .append(route.destination) // TODO: fix too long text
                     .toString()
                 openMapsButton.setOnClickListener {
                     val gmmIntentUri =
