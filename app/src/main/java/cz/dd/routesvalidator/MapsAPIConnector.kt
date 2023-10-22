@@ -19,7 +19,7 @@ class MapsAPIConnector private constructor(): AutoCloseable {
         @Volatile
         private var instance: MapsAPIConnector? = null
 
-        fun getInstance() =
+        @Synchronized fun getInstance() =
             instance ?: synchronized(this) {
                 instance ?: MapsAPIConnector().also { instance = it }
             }

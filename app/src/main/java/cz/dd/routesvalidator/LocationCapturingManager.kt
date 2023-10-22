@@ -12,5 +12,6 @@ class LocationCapturingManager {
             }
     }
 
+    @Volatile
     var keepCapturing = false
 }

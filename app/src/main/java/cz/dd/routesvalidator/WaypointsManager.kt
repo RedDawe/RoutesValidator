@@ -5,6 +5,7 @@ import cz.dd.routesvalidator.datamodel.Route
 import java.time.LocalDateTime
 
 class WaypointsManager private constructor() {
+    // TODO: all should be synced, ideally on methods
     private var currentWaypoint: Coordinate? = null
     private var currentWaypointOccurrences = 0
     private var isFirstWaypoint = true
