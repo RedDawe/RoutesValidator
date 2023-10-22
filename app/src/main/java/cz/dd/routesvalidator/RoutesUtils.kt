@@ -3,6 +3,7 @@ package cz.dd.routesvalidator
 import android.content.Context
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
+import java.time.LocalDateTime
 import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.pow
@@ -15,7 +16,11 @@ fun isRouteShortest(route: Route, optimalWaypoints: List<Coordinate>): Boolean {
     for (optimalWaypoint in optimalWaypoints) {
         var foundMatching = false
         for (actuallWaypoint in route.waypoints) {
-            if (calculateDistanceKilometers(actuallWaypoint, optimalWaypoint) * 1000 < SAME_WAYPOINT_THRESHOLD_DISTANCE_METERS) {
+            if (calculateDistanceKilometers(
+                    actuallWaypoint,
+                    optimalWaypoint
+                ) * 1000 < SAME_WAYPOINT_THRESHOLD_DISTANCE_METERS
+            ) {
                 foundMatching = true
             }
         }
@@ -41,9 +46,9 @@ fun appendSuspectedRoute(route: Route, context: Context) { // TODO: notify user
 
     context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
         for (existingSuspectingRoute in existingSuspectedRoutes) {
-            it.write(existingSuspectingRoute.csvString().toByteArray())
+            it.write(existingSuspectingRoute.csvLine().toByteArray())
         }
-        it.write(route.csvString().toByteArray())
+        it.write(route.csvLine().toByteArray())
     }
 }
 
@@ -61,10 +66,17 @@ fun loadSuspectedRoutes(context: Context): List<Route> {
         if (line.isBlank()) return emptyList()
         val valueList = line.trim().split(",")
         val waypoints = mutableListOf<Coordinate>()
-        for (i in 4 until valueList.size) {
+        for (i in 5 until valueList.size) {
             waypoints.add(Coordinate(valueList[i].toDouble(), valueList[i + 1].toDouble()))
         }
-        routes.add(Route(Coordinate(valueList[0].toDouble(), valueList[1].toDouble()), Coordinate(valueList[2].toDouble(), valueList[3].toDouble()), waypoints))
+        routes.add(
+            Route(
+                Coordinate(valueList[0].toDouble(), valueList[1].toDouble()),
+                Coordinate(valueList[2].toDouble(), valueList[3].toDouble()),
+                waypoints,
+                LocalDateTime.parse(valueList[4])
+            )
+        )
     }
 
     return routes

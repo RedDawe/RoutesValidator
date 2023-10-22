@@ -11,6 +11,7 @@ import androidx.work.WorkerParameters
 import com.google.android.gms.location.LocationServices
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
+import java.time.LocalDateTime
 import kotlin.random.Random
 
 class CaptureLocationWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
@@ -35,6 +36,10 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     private fun captureLocation() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
+                val a = Coordinate(38.8976, -77.0366)
+                val b = Coordinate(39.9496, -75.1503)
+                appendSuspectedRoute(Route(a, b, emptyList(), LocalDateTime.now()), context)
+
                 val potentialRoute = WaypointsManager.getInstance().processWaypoint(Coordinate(location.latitude, location.longitude))
                 if (potentialRoute != null && !isRouteShortest(potentialRoute, MapsAPIConnector.getInstance().fetchOptimalWaypointsForRoute(potentialRoute))) {
                     if (LocationCapturingManager.getInstance().keepCapturing) {

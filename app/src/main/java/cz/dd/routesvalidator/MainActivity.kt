@@ -87,43 +87,47 @@ class MainActivity : ComponentActivity() {
                 // TODO: capture 1 last time
                 LocationCapturingManager.getInstance().keepCapturing = false
                 WaypointsManager.getInstance().finishAddingWaypoints()
+                reloadSuspectedRoutes()
             }
         }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) { // TODO: also call on stop tracking/ add route or smth
         super.onWindowFocusChanged(hasFocus)
-
         if (hasFocus) {
-            val suspectedRoutesView = findViewById<LinearLayout>(R.id.suspectedRoutes)
-            suspectedRoutesView.removeAllViews()
+            reloadSuspectedRoutes()
+        }
+    }
 
-            val suspectedRoutes = loadSuspectedRoutes(this)
-            for (route in suspectedRoutes) {
-                val buttonsPair = LinearLayout(this)
-                buttonsPair.orientation = LinearLayout.HORIZONTAL
-                suspectedRoutesView.addView(buttonsPair)
+    private fun reloadSuspectedRoutes() {
+        val suspectedRoutesView = findViewById<LinearLayout>(R.id.suspectedRoutes)
+        suspectedRoutesView.removeAllViews()
 
-                val openMapsButton = Button(this)
-                openMapsButton.text = StringBuilder().append(route.origin.latitude)
-                    .append(" -> ")
-//                    .append(route.destination) // TODO: fix too long text
-                    .toString()
-                openMapsButton.setOnClickListener {
-                    val gmmIntentUri =
-                        Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + route.origin + "&destination=" + route.destination + "&travelmode=transit")
-                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                    startActivity(mapIntent)
-                }
-                buttonsPair.addView(openMapsButton)
+        val suspectedRoutes = loadSuspectedRoutes(this)
+        for (route in suspectedRoutes) {
+            val buttonsPair = LinearLayout(this)
+            buttonsPair.orientation = LinearLayout.HORIZONTAL
+            suspectedRoutesView.addView(buttonsPair)
 
-                val deleteButton = ImageButton(this)
-                deleteButton.setImageResource(R.drawable.delete)
-                deleteButton.setOnClickListener {
-                    suspectedRoutesView.removeView(buttonsPair)
-                }
-                buttonsPair.addView(deleteButton)
+            val openMapsButton = Button(this)
+            openMapsButton.text = StringBuilder().append(route.finishTime.toLocalDate())
+                .append(System.lineSeparator())
+                .append(route.finishTime.toLocalTime())
+                .toString()
+            openMapsButton.setOnClickListener {
+                val gmmIntentUri =
+                    Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + route.origin + "&destination=" + route.destination + "&travelmode=transit")
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                startActivity(mapIntent)
             }
+            buttonsPair.addView(openMapsButton)
+
+            val deleteButton = ImageButton(this)
+            deleteButton.setBackgroundResource(R.drawable.delete)
+            deleteButton.setOnClickListener {
+                suspectedRoutesView.removeView(buttonsPair)
+            }
+            buttonsPair.addView(deleteButton)
         }
     }
 }

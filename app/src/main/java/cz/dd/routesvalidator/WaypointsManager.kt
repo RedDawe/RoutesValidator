@@ -2,6 +2,7 @@ package cz.dd.routesvalidator
 
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
+import java.time.LocalDateTime
 
 class WaypointsManager private constructor() {
     private var currentWaypoint: Coordinate? = null
@@ -54,7 +55,7 @@ class WaypointsManager private constructor() {
             currentWaypoint = waypoint
 
         } else {
-            result = Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints)
+            result = Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints, LocalDateTime.now())
             currentWaypoints = mutableListOf()
             lastPlaceOfStay = currentWaypointImmutableCopy
             currentWaypointOccurrences = 1
@@ -69,7 +70,7 @@ class WaypointsManager private constructor() {
         val currentWaypointImmutableCopy = currentWaypoint
         val lastPlaceOfStayImmutableCopy = lastPlaceOfStay
         if (currentWaypointImmutableCopy == null || lastPlaceOfStayImmutableCopy == null) return null
-        val result = Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints)
+        val result = Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints, LocalDateTime.now())
 
         reset()
 
