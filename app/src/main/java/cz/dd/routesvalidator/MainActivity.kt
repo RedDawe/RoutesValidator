@@ -15,6 +15,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Switch
 import androidx.activity.ComponentActivity
+import androidx.appcompat.widget.SwitchCompat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.Delete
@@ -23,12 +24,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 private const val CAPTURE_LOCATION_REQUEST_TAG = "CAPTURE_LOCATION_REQUEST_TAG"
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var trackingSwitch: Switch
+    private val waypointsManager = WaypointsManager.getInstance()
+    private val locationCapturingManager = LocationCapturingManager.getInstance()
 
     private fun explanationMessage(permission: String): String {
         val baseMessage = """
@@ -73,20 +77,20 @@ class MainActivity : ComponentActivity() {
 
         resetFile(this)
 
-        trackingSwitch = findViewById<Switch>(R.id.trackingSwitch)
+        trackingSwitch = findViewById(R.id.trackingSwitch)
         trackingSwitch.setOnCheckedChangeListener { view, isChecked ->
             if (isChecked) {
                 if (doPermission()) {
-                    WaypointsManager.getInstance().reset()
+                    waypointsManager.reset()
                     val locationCaptureRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                         .build()
-                    LocationCapturingManager.getInstance().keepCapturing = true
+                    locationCapturingManager.keepCapturing = true
                     WorkManager.getInstance(this).enqueue(locationCaptureRequest)
                 }
             } else {
                 // TODO: capture 1 last time
-                LocationCapturingManager.getInstance().keepCapturing = false
-                WaypointsManager.getInstance().finishAddingWaypoints()
+                locationCapturingManager.keepCapturing = false
+                waypointsManager.finishAddingWaypoints()
                 reloadSuspectedRoutes()
             }
         }

@@ -14,12 +14,16 @@ import cz.dd.routesvalidator.datamodel.Route
 import java.time.LocalDateTime
 import kotlin.random.Random
 
-class CaptureLocationWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class CaptureLocationWorker(private val context: Context, workerParams: WorkerParameters) :
+    CoroutineWorker(context, workerParams) {
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    private val locationCapturingManager = LocationCapturingManager.getInstance()
+    private val waypointsManager = WaypointsManager.getInstance()
+    private val mapsAPIConnector = MapsAPIConnector.getInstance()
 
     override suspend fun doWork(): Result {
-        if (LocationCapturingManager.getInstance().keepCapturing) {
+        if (locationCapturingManager.keepCapturing) {
             val nextLocationCapture: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                 .setInitialDelay(WAYPOINT_LOCATION_CAPTURE_DELAY)
                 .build()
@@ -30,8 +34,6 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         return Result.success()
     }
 
-
-
     @SuppressLint("MissingPermission")
     private fun captureLocation() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
@@ -40,9 +42,13 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
                 val b = Coordinate(39.9496, -75.1503)
                 appendSuspectedRoute(Route(a, b, emptyList(), LocalDateTime.now()), context)
 
-                val potentialRoute = WaypointsManager.getInstance().processWaypoint(Coordinate(location.latitude, location.longitude))
-                if (potentialRoute != null && !isRouteShortest(potentialRoute, MapsAPIConnector.getInstance().fetchOptimalWaypointsForRoute(potentialRoute))) {
-                    if (LocationCapturingManager.getInstance().keepCapturing) {
+                val potentialRoute = waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude))
+                if (potentialRoute != null && !isRouteShortest(
+                        potentialRoute,
+                        mapsAPIConnector.fetchOptimalWaypointsForRoute(potentialRoute)
+                    )
+                ) {
+                    if (locationCapturingManager.keepCapturing) {
                         appendSuspectedRoute(potentialRoute, context)
                     }
                 }
