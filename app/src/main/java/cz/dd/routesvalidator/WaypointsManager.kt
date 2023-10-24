@@ -4,7 +4,7 @@ import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 import java.time.LocalDateTime
 
-class WaypointsManager private constructor() {
+class WaypointsManager private constructor(private val isAPlaceOfStayConsecutiveWaypointsThreshold: Double) {
     // TODO: all should be synced, ideally on methods
     private var currentWaypoint: Coordinate? = null
     private var currentWaypointOccurrences = 0
@@ -19,12 +19,12 @@ class WaypointsManager private constructor() {
 
         fun getInstance(): WaypointsManager {
             return instance ?: synchronized(this) {
-                instance ?: WaypointsManager().also { instance = it }
+                instance ?: WaypointsManager(IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD).also { instance = it }
             }
         }
 
-        fun getNewInstanceForTests(): WaypointsManager {
-            return WaypointsManager()
+        fun getNewInstanceForTests(isAPlaceOfStayConsecutiveWaypointsThreshold: Double): WaypointsManager {
+            return WaypointsManager(isAPlaceOfStayConsecutiveWaypointsThreshold)
         }
     }
 
@@ -41,7 +41,7 @@ class WaypointsManager private constructor() {
         } else if (areTheSamePlace(waypoint, currentWaypointImmutableCopy)) {
             currentWaypointOccurrences++
 
-        } else if (!isFirstWaypoint && currentWaypointOccurrences < IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD) {
+        } else if (!isFirstWaypoint && currentWaypointOccurrences < isAPlaceOfStayConsecutiveWaypointsThreshold) {
             currentWaypoints.add(currentWaypointImmutableCopy)
             currentWaypointOccurrences = 1
             isFirstWaypoint = false

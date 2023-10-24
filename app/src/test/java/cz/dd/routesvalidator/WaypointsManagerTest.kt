@@ -11,6 +11,8 @@ private fun roundTo2DecimalPlaces(number: Double): Double {
     return (number * 100).roundToInt().toDouble() / 100
 }
 
+private const val IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD_TESTS = 3.0
+
 private val a = Coordinate(38.8976, -77.0366)
 private val b = Coordinate(39.9496, -75.1503)
 private val c1 = Coordinate(40.689361, -74.044705)
@@ -99,7 +101,9 @@ class WaypointsManagerTest {
         for ((capturedWaypoints, expectedRoutes) in waypointsRoutesTestValues) {
             val routes = mutableListOf<Route>()
 
-            val waypointsManager = WaypointsManager.getNewInstanceForTests()
+            val waypointsManager = WaypointsManager.getNewInstanceForTests(
+                IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD_TESTS
+            )
             for (capturedWaypoint in capturedWaypoints) {
                 val potentialRoute = waypointsManager.processWaypoint(capturedWaypoint)
                 if (potentialRoute != null) routes.add(potentialRoute)
