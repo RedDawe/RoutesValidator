@@ -124,7 +124,7 @@ class MainActivity : ComponentActivity() {
             val deleteButton = ImageButton(this)
             deleteButton.setBackgroundResource(R.drawable.delete)
             deleteButton.setOnClickListener {
-                suspectedRoutesView.removeView(buttonsPair)
+                suspectedRoutesView.removeView(buttonsPair) // TODO: also delete in DB
             }
             buttonsPair.addView(deleteButton)
         }
