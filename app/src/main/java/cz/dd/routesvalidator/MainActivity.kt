@@ -2,12 +2,8 @@ package cz.dd.routesvalidator
 
 import android.Manifest
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.VectorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
@@ -15,16 +11,9 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Switch
 import androidx.activity.ComponentActivity
-import androidx.appcompat.widget.SwitchCompat
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material3.Icon
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.google.android.material.switchmaterial.SwitchMaterial
 
 class MainActivity : ComponentActivity() {
 
@@ -50,7 +39,7 @@ class MainActivity : ComponentActivity() {
         return ""
     }
 
-    private fun doPermission(): Boolean {
+    private fun requestPermissions(): Boolean {
         val missingPermission = arrayOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -78,7 +67,7 @@ class MainActivity : ComponentActivity() {
         trackingSwitch = findViewById(R.id.trackingSwitch)
         trackingSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                if (doPermission()) {
+                if (requestPermissions()) {
                     waypointsManager.reset()
                     val locationCaptureRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                         .build()
