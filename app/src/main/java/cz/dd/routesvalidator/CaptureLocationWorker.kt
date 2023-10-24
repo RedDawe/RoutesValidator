@@ -38,7 +38,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     private fun captureLocation() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
-                val a = Coordinate(38.8976, -77.0366)
+                val a = Coordinate(38.8976, -77.0366) // TODO: remove testing code
                 val b = Coordinate(39.9496, -75.1503)
                 appendSuspectedRoute(Route(a, b, emptyList(), LocalDateTime.now()), context)
 
