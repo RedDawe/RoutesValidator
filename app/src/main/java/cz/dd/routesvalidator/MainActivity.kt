@@ -73,8 +73,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        resetFile(this)
-
         locationCapturingManager.mainActivity = this
 
         trackingSwitch = findViewById(R.id.trackingSwitch)
