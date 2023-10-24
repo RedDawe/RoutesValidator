@@ -22,6 +22,7 @@ fun isRouteShortest(route: Route, optimalWaypoints: List<Coordinate>): Boolean {
                 ) * 1000 < SAME_WAYPOINT_THRESHOLD_DISTANCE_METERS
             ) {
                 foundMatching = true
+                break
             }
         }
         if (!foundMatching) return false
