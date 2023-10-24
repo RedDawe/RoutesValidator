@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
         resetFile(this)
 
         trackingSwitch = findViewById(R.id.trackingSwitch)
-        trackingSwitch.setOnCheckedChangeListener { view, isChecked ->
+        trackingSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 if (doPermission()) {
                     waypointsManager.reset()
@@ -90,6 +90,7 @@ class MainActivity : ComponentActivity() {
             } else {
                 // TODO: capture 1 last time
                 locationCapturingManager.keepCapturing = false
+                WorkManager.getInstance(this)
                 waypointsManager.finishAddingWaypoints()
                 reloadSuspectedRoutes()
             }
