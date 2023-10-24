@@ -26,8 +26,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.material.switchmaterial.SwitchMaterial
 
-private const val CAPTURE_LOCATION_REQUEST_TAG = "CAPTURE_LOCATION_REQUEST_TAG"
-
 class MainActivity : ComponentActivity() {
 
     private lateinit var trackingSwitch: Switch
