@@ -46,8 +46,8 @@ fun appendSuspectedRoute(route: Route, context: Context) { // TODO: notify user
     val existingSuspectedRoutes = loadSuspectedRoutes(context)
 
     context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
-        for (existingSuspectingRoute in existingSuspectedRoutes) {
-            it.write(existingSuspectingRoute.csvLine().toByteArray())
+        for (existingSuspectedRoute in existingSuspectedRoutes) {
+            it.write(existingSuspectedRoute.csvLine().toByteArray())
         }
         it.write(route.csvLine().toByteArray())
     }
@@ -81,4 +81,16 @@ fun loadSuspectedRoutes(context: Context): List<Route> {
     }
 
     return routes
+}
+
+fun deleteMatchingRoutes(route: Route, context: Context) {
+    val existingSuspectedRoutes = loadSuspectedRoutes(context)
+
+    context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
+        for (existingSuspectedRoute in existingSuspectedRoutes) {
+            if (existingSuspectedRoute != route) {
+                it.write(existingSuspectedRoute.csvLine().toByteArray())
+            }
+        }
+    }
 }
