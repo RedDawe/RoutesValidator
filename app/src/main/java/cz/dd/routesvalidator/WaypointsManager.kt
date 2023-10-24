@@ -5,7 +5,6 @@ import cz.dd.routesvalidator.datamodel.Route
 import java.time.LocalDateTime
 
 class WaypointsManager private constructor(private val isAPlaceOfStayConsecutiveWaypointsThreshold: Double) {
-    // TODO: all should be synced, ideally on methods
     private var currentWaypoint: Coordinate? = null
     private var currentWaypointOccurrences = 0
     private var isFirstWaypoint = true
@@ -28,7 +27,7 @@ class WaypointsManager private constructor(private val isAPlaceOfStayConsecutive
         }
     }
 
-    fun processWaypoint(waypoint: Coordinate): Route? {
+    @Synchronized fun processWaypoint(waypoint: Coordinate): Route? {
         var result: Route? = null
 
         val currentWaypointImmutableCopy = currentWaypoint
@@ -67,7 +66,7 @@ class WaypointsManager private constructor(private val isAPlaceOfStayConsecutive
         return result
     }
 
-    fun finishAddingWaypoints(): Route? {
+    @Synchronized fun finishAddingWaypoints(): Route? {
         val currentWaypointImmutableCopy = currentWaypoint
         val lastPlaceOfStayImmutableCopy = lastPlaceOfStay
         if (currentWaypointImmutableCopy == null || lastPlaceOfStayImmutableCopy == null) return null
@@ -79,15 +78,15 @@ class WaypointsManager private constructor(private val isAPlaceOfStayConsecutive
         return result
     }
 
-    private fun areTheSamePlace(placeA: Coordinate, placeB: Coordinate): Boolean {
-        return calculateDistanceKilometers(placeA, placeB) * 1000 < SAME_PLACE_OF_STAY_THRESHOLD_DISTANCE_METERS
-    }
-
-    fun reset() {
+    @Synchronized fun reset() {
         currentWaypoint = null
         currentWaypointOccurrences = 0
         isFirstWaypoint = true
         currentWaypoints = mutableListOf()
         lastPlaceOfStay = null
+    }
+
+    private fun areTheSamePlace(placeA: Coordinate, placeB: Coordinate): Boolean {
+        return calculateDistanceKilometers(placeA, placeB) * 1000 < SAME_PLACE_OF_STAY_THRESHOLD_DISTANCE_METERS
     }
 }
