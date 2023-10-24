@@ -19,10 +19,11 @@ class MapsAPIConnector private constructor(): AutoCloseable {
         @Volatile
         private var instance: MapsAPIConnector? = null
 
-        @Synchronized fun getInstance() =
-            instance ?: synchronized(this) {
+        fun getInstance(): MapsAPIConnector {
+            return instance ?: synchronized(this) {
                 instance ?: MapsAPIConnector().also { instance = it }
             }
+        }
     }
 
     fun fetchOptimalWaypointsForRoute(route: Route): List<Coordinate> {

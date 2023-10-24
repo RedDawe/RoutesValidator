@@ -17,14 +17,13 @@ class WaypointsManager private constructor() {
         @Volatile
         private var instance: WaypointsManager? = null
 
-        fun getInstance(): WaypointsManager { // TODO: dont do javascript fun defiinition?
-            return synchronized(this) { // TODO: only checck when synced
-                instance ?: WaypointsManager().also { instance = it } // TODO: rewrite in Java like code?
+        fun getInstance(): WaypointsManager {
+            return instance ?: synchronized(this) {
+                instance ?: WaypointsManager().also { instance = it }
             }
         }
 
-        fun getInstance(test: Boolean): WaypointsManager {
-            if (!test) return getInstance()
+        fun getNewInstanceForTests(): WaypointsManager {
             return WaypointsManager()
         }
     }
@@ -56,7 +55,8 @@ class WaypointsManager private constructor() {
             currentWaypoint = waypoint
 
         } else {
-            result = Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints, LocalDateTime.now())
+            result =
+                Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints, LocalDateTime.now())
             currentWaypoints = mutableListOf()
             lastPlaceOfStay = currentWaypointImmutableCopy
             currentWaypointOccurrences = 1
@@ -71,7 +71,8 @@ class WaypointsManager private constructor() {
         val currentWaypointImmutableCopy = currentWaypoint
         val lastPlaceOfStayImmutableCopy = lastPlaceOfStay
         if (currentWaypointImmutableCopy == null || lastPlaceOfStayImmutableCopy == null) return null
-        val result = Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints, LocalDateTime.now())
+        val result =
+            Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints, LocalDateTime.now())
 
         reset()
 

@@ -6,10 +6,11 @@ class LocationCapturingManager {
         @Volatile
         private var instance: LocationCapturingManager? = null
 
-        fun getInstance() =
-            instance ?: synchronized(this) {
+        fun getInstance(): LocationCapturingManager {
+            return instance ?: synchronized(this) {
                 instance ?: LocationCapturingManager().also { instance = it }
             }
+        }
     }
 
     @Volatile
