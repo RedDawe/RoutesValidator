@@ -99,7 +99,7 @@ class WaypointsManagerTest {
         for ((capturedWaypoints, expectedRoutes) in waypointsRoutesTestValues) {
             val routes = mutableListOf<Route>()
 
-            val waypointsManager = WaypointsManager.getNewInstanceForTests(true)
+            val waypointsManager = WaypointsManager.getNewInstanceForTests()
             for (capturedWaypoint in capturedWaypoints) {
                 val potentialRoute = waypointsManager.processWaypoint(capturedWaypoint)
                 if (potentialRoute != null) routes.add(potentialRoute)
