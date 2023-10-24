@@ -88,7 +88,6 @@ class MainActivity : ComponentActivity() {
             } else {
                 // TODO: capture 1 last time
                 locationCapturingManager.keepCapturing = false
-                WorkManager.getInstance(this)
                 waypointsManager.finishAddingWaypoints()
                 reloadSuspectedRoutes()
             }
