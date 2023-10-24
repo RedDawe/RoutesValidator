@@ -15,4 +15,5 @@ class LocationCapturingManager {
 
     @Volatile
     var keepCapturing = false
+    var mainActivity: MainActivity? = null
 }

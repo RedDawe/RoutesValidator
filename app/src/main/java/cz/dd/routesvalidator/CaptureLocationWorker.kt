@@ -30,6 +30,8 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
             WorkManager.getInstance(context).enqueue(nextLocationCapture)
 
             captureLocation()
+        } else {
+            processPotentialRoute(waypointsManager.finishAddingWaypoints())
         }
         return Result.success()
     }
@@ -38,20 +40,26 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     private fun captureLocation() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
-                val a = Coordinate(38.8976, -77.0366) // TODO: remove testing code
+                val a = Coordinate(38.8976, -77.0366)
                 val b = Coordinate(39.9496, -75.1503)
                 appendSuspectedRoute(Route(a, b, emptyList(), LocalDateTime.now()), context)
+                locationCapturingManager.mainActivity?.reloadSuspectedRoutes() // TODO: remove testing code
 
                 val potentialRoute = waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude))
-                if (potentialRoute != null && !isRouteShortest(
-                        potentialRoute,
-                        mapsAPIConnector.fetchOptimalWaypointsForRoute(potentialRoute)
-                    )
-                ) {
-                    if (locationCapturingManager.keepCapturing) {
-                        appendSuspectedRoute(potentialRoute, context)
-                    }
-                }
+                processPotentialRoute(potentialRoute)
+            }
+        }
+    }
+
+    private fun processPotentialRoute(potentialRoute: Route?) {
+        if (potentialRoute != null && !isRouteShortest(
+                potentialRoute,
+                mapsAPIConnector.fetchOptimalWaypointsForRoute(potentialRoute)
+            )
+        ) {
+            if (locationCapturingManager.keepCapturing) {
+                appendSuspectedRoute(potentialRoute, context)
+                locationCapturingManager.mainActivity?.reloadSuspectedRoutes()
             }
         }
     }

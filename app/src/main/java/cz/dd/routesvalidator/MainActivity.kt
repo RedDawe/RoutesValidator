@@ -75,6 +75,8 @@ class MainActivity : ComponentActivity() {
 
         resetFile(this)
 
+        locationCapturingManager.mainActivity = this
+
         trackingSwitch = findViewById(R.id.trackingSwitch)
         trackingSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -86,10 +88,7 @@ class MainActivity : ComponentActivity() {
                     WorkManager.getInstance(this).enqueue(locationCaptureRequest)
                 }
             } else {
-                // TODO: capture 1 last time
                 locationCapturingManager.keepCapturing = false
-                waypointsManager.finishAddingWaypoints()
-                reloadSuspectedRoutes()
             }
         }
     }
@@ -101,7 +100,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun reloadSuspectedRoutes() {
+    fun reloadSuspectedRoutes() {
         val suspectedRoutesView = findViewById<LinearLayout>(R.id.suspectedRoutes)
         suspectedRoutesView.removeAllViews()
 
