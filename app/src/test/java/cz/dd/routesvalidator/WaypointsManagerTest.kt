@@ -101,7 +101,7 @@ class WaypointsManagerTest {
         for ((capturedWaypoints, expectedRoutes) in waypointsRoutesTestValues) {
             val routes = mutableListOf<Route>()
 
-            val waypointsManager = WaypointsManager.getNewInstanceForTests(
+            val waypointsManager = WaypointsManager.getNewInstanceForTests( // TODO: use 1 manager and reset()
                 IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD_TESTS
             )
             for (capturedWaypoint in capturedWaypoints) {
