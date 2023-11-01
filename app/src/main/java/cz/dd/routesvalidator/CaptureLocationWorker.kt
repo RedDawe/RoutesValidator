@@ -1,8 +1,11 @@
 package cz.dd.routesvalidator
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.location.Location
+import androidx.core.app.ActivityCompat
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
@@ -36,13 +39,28 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         return Result.success()
     }
 
+    private fun checkCorePermission() : Boolean {
+        val missingPermissions = arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        ).filter { ActivityCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED }
+        if (missingPermissions.isNotEmpty()) {
+            locationCapturingManager.mainActivity?.removedCorePermissionCallback()
+            return false
+        }
+        return true
+    }
+
     @SuppressLint("MissingPermission")
     private fun captureLocation() {
+        if (!checkCorePermission()) return
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            val a = Coordinate(38.8976, -77.0366)
-            val b = Coordinate(39.9496, -75.1503)
-            appendSuspectedRoute(Route(a, b, emptyList(), LocalDateTime.now()), context)
-            locationCapturingManager.mainActivity?.reloadSuspectedRoutes() // TODO: Remove testing code
+//            val a = Coordinate(38.8976, -77.0366)
+//            val b = Coordinate(39.9496, -75.1503)
+//            appendSuspectedRoute(Route(a, b, emptyList(), LocalDateTime.now()), context)
+//            locationCapturingManager.mainActivity?.addedNewSuspectedRouteCallback()
+            // TODO: Remove testing code
 
             if (location != null) {
                 processPotentialRoute(waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude)))
@@ -52,6 +70,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
 
     @SuppressLint("MissingPermission") // TODO: What if permission removed
     private fun captureLocationAndFinishCapturing() {
+        if (!checkCorePermission()) return
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
                 processPotentialRoute(waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude)))
@@ -65,7 +84,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
             !isRouteShortest(potentialRoute, mapsAPIConnector.fetchOptimalWaypointsForRoute(potentialRoute))
         ) {
             appendSuspectedRoute(potentialRoute, context)
-            locationCapturingManager.mainActivity?.reloadSuspectedRoutes()
+            locationCapturingManager.mainActivity?.addedNewSuspectedRouteCallback()
         }
     }
 }

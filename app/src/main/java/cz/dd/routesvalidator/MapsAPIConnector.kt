@@ -37,14 +37,12 @@ class MapsAPIConnector private constructor(): AutoCloseable {
     }
 
     private fun fetchOptimalDirection(route: Route): DirectionsResult {
-        val directionsResult = DirectionsApi.newRequest(context)
+        return DirectionsApi.newRequest(context)
             .origin(LatLng(route.origin.latitude, route.origin.longitude))
             .destination(LatLng(route.destination.latitude, route.destination.longitude))
             .mode(TravelMode.TRANSIT)
             .units(Unit.METRIC)
             .await()
-
-        return directionsResult
     }
 
     override fun close() {

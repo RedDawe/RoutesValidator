@@ -42,7 +42,7 @@ fun calculateDistanceKilometers(placeA: Coordinate, placeB: Coordinate): Double 
     return 2 * EARTH_RADIUS_KILOMETERS * asin(sqrt(haversine))
 }
 
-fun appendSuspectedRoute(route: Route, context: Context) { // TODO: notify user
+fun appendSuspectedRoute(route: Route, context: Context) {
     val existingSuspectedRoutes = loadSuspectedRoutes(context)
 
     context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
