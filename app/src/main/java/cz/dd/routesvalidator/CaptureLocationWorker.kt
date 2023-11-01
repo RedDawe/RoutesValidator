@@ -60,6 +60,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
 //            val b = Coordinate(39.9496, -75.1503)
 //            appendSuspectedRoute(Route(a, b, emptyList(), LocalDateTime.now()), context)
 //            locationCapturingManager.mainActivity?.addedNewSuspectedRouteCallback()
+//            processPotentialRoute(Route(a, b, emptyList(), LocalDateTime.now()))
             // TODO: Remove testing code
 
             if (location != null) {
