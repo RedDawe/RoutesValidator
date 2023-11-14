@@ -3,7 +3,7 @@ package cz.dd.routesvalidator
 import java.time.Duration
 
 const val EARTH_RADIUS_KILOMETERS = 6371
-const val SAME_WAYPOINT_THRESHOLD_DISTANCE_METERS = 50
+const val SAME_WAYPOINT_THRESHOLD_DISTANCE_METERS = 50 // TODO: this and below sawpped?
 const val SAME_PLACE_OF_STAY_THRESHOLD_DISTANCE_METERS = 100
 private const val MAXIMUM_EXPECTED_SPEED_KMH = 90
 private const val MINIMUM_EXPECTED_SPEED_KMH = 4

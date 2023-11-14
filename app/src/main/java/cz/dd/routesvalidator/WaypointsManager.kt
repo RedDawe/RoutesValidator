@@ -4,6 +4,7 @@ import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 import java.time.LocalDateTime
 
+// TODO: ideally this class would be saved persistently and loaded for every change
 class WaypointsManager private constructor(private val isAPlaceOfStayConsecutiveWaypointsThreshold: Double) {
     private var currentWaypoint: Coordinate? = null
     private var currentWaypointOccurrences = 0

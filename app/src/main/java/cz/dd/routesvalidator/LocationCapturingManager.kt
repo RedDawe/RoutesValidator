@@ -2,6 +2,7 @@ package cz.dd.routesvalidator
 
 import com.google.maps.model.TravelMode
 
+// TODO: ideally this class would be saved persistently and loaded for every change
 class LocationCapturingManager {
     companion object {
 
