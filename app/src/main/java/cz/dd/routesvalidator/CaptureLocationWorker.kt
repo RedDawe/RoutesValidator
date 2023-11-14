@@ -82,7 +82,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
 
     private fun processPotentialRoute(potentialRoute: Route?) {
         if (potentialRoute != null &&
-            !isRouteShortest(potentialRoute, mapsAPIConnector.fetchOptimalWaypointsForRoute(potentialRoute))
+            !isRouteShortest(potentialRoute, mapsAPIConnector.fetchOptimalWaypointsForRoute(potentialRoute, locationCapturingManager.travelMode))
         ) {
             appendSuspectedRoute(potentialRoute, context)
             locationCapturingManager.mainActivity?.addedNewSuspectedRouteCallback()

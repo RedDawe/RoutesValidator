@@ -7,7 +7,10 @@ class Route(
     val destination: Coordinate,
     val waypoints: List<Coordinate>,
     val finishTime: LocalDateTime
-) {
+)  {
+    constructor(origin: Coordinate, destination: Coordinate, waypoints: List<Coordinate>) : // constructor for tests
+            this(origin, destination, waypoints, LocalDateTime.now())
+
     fun csvLine(): String {
         val stringBuilder = StringBuilder().append(origin)
             .append(",")

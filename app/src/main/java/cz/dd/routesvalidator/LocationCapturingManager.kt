@@ -1,5 +1,7 @@
 package cz.dd.routesvalidator
 
+import com.google.maps.model.TravelMode
+
 class LocationCapturingManager {
     companion object {
 
@@ -15,5 +17,8 @@ class LocationCapturingManager {
 
     @Volatile
     var keepCapturing = false
+    @Volatile
     var mainActivity: MainActivity? = null
+    @Volatile
+    var travelMode = TravelMode.WALKING;
 }

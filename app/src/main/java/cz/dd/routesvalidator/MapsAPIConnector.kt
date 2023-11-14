@@ -26,8 +26,8 @@ class MapsAPIConnector private constructor(): AutoCloseable {
         }
     }
 
-    fun fetchOptimalWaypointsForRoute(route: Route): List<Coordinate> {
-        val directionsResult = fetchOptimalDirection(route)
+    fun fetchOptimalWaypointsForRoute(route: Route, travelMode: TravelMode): List<Coordinate> {
+        val directionsResult = fetchOptimalDirection(route, travelMode)
 
         val waypoints = mutableListOf<Coordinate>()
         for (step in directionsResult.routes[0].legs[0].steps) {
@@ -36,11 +36,11 @@ class MapsAPIConnector private constructor(): AutoCloseable {
         return waypoints
     }
 
-    private fun fetchOptimalDirection(route: Route): DirectionsResult {
+    private fun fetchOptimalDirection(route: Route, travelMode: TravelMode): DirectionsResult {
         return DirectionsApi.newRequest(context)
             .origin(LatLng(route.origin.latitude, route.origin.longitude))
             .destination(LatLng(route.destination.latitude, route.destination.longitude))
-            .mode(TravelMode.TRANSIT)
+            .mode(travelMode)
             .units(Unit.METRIC)
             .await()
     }

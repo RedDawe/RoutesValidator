@@ -3,7 +3,7 @@ package cz.dd.routesvalidator
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 import junit.framework.TestCase.assertEquals
-import org.assertj.core.api.AssertionsForClassTypes.assertThat
+import org.assertj.core.api.Assertions.*
 import org.junit.Test
 import kotlin.math.roundToInt
 
@@ -98,20 +98,25 @@ class WaypointsManagerTest {
 
     @Test
     fun extract() {
+        val waypointsManager = WaypointsManager.getNewInstanceForTests(
+            IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD_TESTS
+        )
         for ((capturedWaypoints, expectedRoutes) in waypointsRoutesTestValues) {
-            val routes = mutableListOf<Route>()
+            waypointsManager.reset()
 
-            val waypointsManager = WaypointsManager.getNewInstanceForTests( // TODO: use 1 manager and reset()
-                IS_A_PLACE_OF_STAY_CONSECUTIVE_WAYPOINTS_THRESHOLD_TESTS
-            )
+            val actualRoutes = mutableListOf<Route>()
+
             for (capturedWaypoint in capturedWaypoints) {
                 val potentialRoute = waypointsManager.processWaypoint(capturedWaypoint)
-                if (potentialRoute != null) routes.add(potentialRoute)
+                if (potentialRoute != null) actualRoutes.add(potentialRoute)
             }
             val potentialRoute = waypointsManager.finishAddingWaypoints()
-            if (potentialRoute != null) routes.add(potentialRoute)
+            if (potentialRoute != null) actualRoutes.add(potentialRoute)
 
-            assertThat(routes).isEqualToComparingFieldByFieldRecursively(expectedRoutes)
+            assertThat(actualRoutes).hasSameSizeAs(expectedRoutes)
+            actualRoutes.zip(expectedRoutes).forEach { (actualRoute, expectedRoute) ->
+                assertThat(actualRoute).usingComparator(FinishTimeIndifferentRouteComparator()).isEqualTo(expectedRoute)
+            }
         }
     }
 }
