@@ -48,6 +48,7 @@ class MainActivity : ComponentActivity() {
 
     private val waypointsManager = WaypointsManager.getInstance()
     private val locationCapturingManager = LocationCapturingManager.getInstance()
+    private val mapsAPIConnector = MapsAPIConnector.getInstance()
 
     private lateinit var trackingSwitch: Switch
     private val travelModeSpinner = findViewById<Spinner>(R.id.spinner)
