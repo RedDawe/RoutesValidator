@@ -12,6 +12,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 import java.time.LocalDateTime
@@ -55,7 +56,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     @SuppressLint("MissingPermission")
     private fun captureLocation() {
         if (!checkCorePermission()) return
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
 //            val a = Coordinate(38.8976, -77.0366)
 //            val b = Coordinate(39.9496, -75.1503)
 //            appendSuspectedRoute(Route(a, b, emptyList(), LocalDateTime.now()), context)
@@ -72,7 +73,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     @SuppressLint("MissingPermission") // TODO: What if permission removed
     private fun captureLocationAndFinishCapturing() {
         if (!checkCorePermission()) return
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
             if (location != null) {
                 processPotentialRoute(waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude)))
                 processPotentialRoute(waypointsManager.finishAddingWaypoints())
