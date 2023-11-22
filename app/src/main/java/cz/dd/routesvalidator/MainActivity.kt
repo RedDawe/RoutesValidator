@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
     private val mapsAPIConnector = MapsAPIConnector.getInstance()
 
     private lateinit var trackingSwitch: Switch
-    private val travelModeSpinner = findViewById<Spinner>(R.id.spinner)
+    private lateinit var travelModeSpinner: Spinner
 
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
     private val exampleCounter = intPreferencesKey("travel_mode")
@@ -115,7 +115,7 @@ class MainActivity : ComponentActivity() {
         createNotificationChannels()
         requestNotificationPermission()
 
-
+        travelModeSpinner = findViewById(R.id.spinner)
         travelModeSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
             listOf(TravelMode.WALKING, TravelMode.TRANSIT, TravelMode.BICYCLING, TravelMode.DRIVING)
                 .map { capitalizeFirstLetter(it.toString()) }
