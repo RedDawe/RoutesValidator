@@ -165,9 +165,6 @@ class MainActivity : ComponentActivity() {
         suspectedRoutesView.removeAllViews()
 
         val suspectedRoutes = loadSuspectedRoutes(this)
-        if (suspectedRoutes.isEmpty()) {
-            suspectedRoutesView.addView(TextView(this).apply { text = "Not optimal routes will appear here" })
-        }
         for (route in suspectedRoutes) {
             val buttonsPair = LinearLayout(this)
             buttonsPair.orientation = LinearLayout.HORIZONTAL
