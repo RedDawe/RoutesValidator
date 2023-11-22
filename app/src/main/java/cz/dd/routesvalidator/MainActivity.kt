@@ -180,7 +180,8 @@ class MainActivity : ComponentActivity() {
                 .toString()
             openMapsButton.setOnClickListener {
                 val gmmIntentUri =
-                    Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + route.origin + "&destination=" + route.destination + "&travelmode=transit")
+                    Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + route.origin + "&destination="
+                            + route.destination + "&travelmode=" + locationCapturingManager.travelMode.toString().lowercase())
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 startActivity(mapIntent)
             }
