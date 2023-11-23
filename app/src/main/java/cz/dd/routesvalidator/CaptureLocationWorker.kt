@@ -63,7 +63,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         }
     }
 
-    @SuppressLint("MissingPermission") // TODO: What if permission removed
+    @SuppressLint("MissingPermission")
     private fun captureLocationAndFinishCapturing() {
         if (!checkCorePermission()) return
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
