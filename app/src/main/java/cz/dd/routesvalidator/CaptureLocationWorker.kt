@@ -57,13 +57,6 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     private fun captureLocation() {
         if (!checkCorePermission()) return
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
-//            val a = Coordinate(38.8976, -77.0366)
-//            val b = Coordinate(39.9496, -75.1503)
-//            appendSuspectedRoute(Route(a, b, emptyList(), LocalDateTime.now()), context)
-//            locationCapturingManager.mainActivity?.addedNewSuspectedRouteCallback()
-//            processPotentialRoute(Route(a, b, emptyList(), LocalDateTime.now()))
-            // TODO: Remove testing code
-
             if (location != null) {
                 processPotentialRoute(waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude)))
             }
