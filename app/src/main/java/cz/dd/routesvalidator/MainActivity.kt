@@ -151,6 +151,22 @@ class MainActivity : ComponentActivity() {
                 locationCapturingManager.keepCapturing = false
             }
         }
+
+        val helpButton = findViewById<Button>(R.id.hintButton)
+        helpButton.setOnClickListener() {
+            AlertDialog.Builder(this)
+                .setTitle("Hints")
+                .setMessage("""
+                    Please note few important things while using the application:
+                    
+                    1. The application expects internet connection while tracking is turned on
+                    
+                    2. Please only change travel mode while tracking is turned off
+                """.trimIndent())
+                .setPositiveButton("OK") { _, _ -> }
+                .create()
+                .show()
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
