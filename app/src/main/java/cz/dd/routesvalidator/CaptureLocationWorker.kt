@@ -22,11 +22,15 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     CoroutineWorker(context, workerParams) {
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    private val locationCapturingManager = LocationCapturingManager.getInstance()
-    private val waypointsManager = WaypointsManager.getInstance()
-    private val mapsAPIConnector = MapsAPIConnector.getInstance()
+    private lateinit var waypointsManager: WaypointsManager
+    private lateinit var locationCapturingManager: LocationCapturingManager
+    private lateinit var mapsAPIConnector: MapsAPIConnector
 
     override suspend fun doWork(): Result {
+        waypointsManager = WaypointsManager.getInstance(context)
+        locationCapturingManager = LocationCapturingManager.getInstance()
+        mapsAPIConnector = MapsAPIConnector.getInstance()
+
         if (locationCapturingManager.keepCapturing) {
             val nextLocationCapture: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                 .setInitialDelay(WAYPOINT_LOCATION_CAPTURE_DELAY)
@@ -58,7 +62,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         if (!checkCorePermission()) return
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
             if (location != null) {
-                processPotentialRoute(waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude)))
+                processPotentialRoute(waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude), context))
             }
         }
     }
@@ -68,8 +72,8 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         if (!checkCorePermission()) return
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
             if (location != null) {
-                processPotentialRoute(waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude)))
-                processPotentialRoute(waypointsManager.finishAddingWaypoints())
+                processPotentialRoute(waypointsManager.processWaypoint(Coordinate(location.latitude, location.longitude), context))
+                processPotentialRoute(waypointsManager.finishAddingWaypoints(context))
             }
         }
     }

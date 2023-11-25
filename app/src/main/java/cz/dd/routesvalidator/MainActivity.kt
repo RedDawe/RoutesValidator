@@ -46,9 +46,9 @@ private const val CORE_PERMISSION_REMOVED_CHANNEL_ID = "CORE_PERMISSION_REMOVED"
 @SuppressLint("UseSwitchCompatOrMaterialCode")
 class MainActivity : ComponentActivity() {
 
-    private val waypointsManager = WaypointsManager.getInstance()
-    private val locationCapturingManager = LocationCapturingManager.getInstance()
-    private val mapsAPIConnector = MapsAPIConnector.getInstance()
+    private lateinit var waypointsManager: WaypointsManager
+    private lateinit var locationCapturingManager: LocationCapturingManager
+    private lateinit var mapsAPIConnector: MapsAPIConnector
 
     private lateinit var trackingSwitch: Switch
     private lateinit var travelModeSpinner: Spinner
@@ -111,6 +111,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        waypointsManager = WaypointsManager.getInstance(this)
+        locationCapturingManager = LocationCapturingManager.getInstance()
+        mapsAPIConnector = MapsAPIConnector.getInstance()
+
+
         locationCapturingManager.mainActivity = this
         createNotificationChannels()
         requestNotificationPermission()
@@ -141,7 +146,7 @@ class MainActivity : ComponentActivity() {
         trackingSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 if (requestCorePermissions()) {
-                    waypointsManager.reset()
+                    waypointsManager.reset(this)
                     val locationCaptureRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                         .build()
                     locationCapturingManager.keepCapturing = true
