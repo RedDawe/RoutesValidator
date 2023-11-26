@@ -20,7 +20,6 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Switch
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -52,9 +51,6 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var trackingSwitch: Switch
     private lateinit var travelModeSpinner: Spinner
-
-    val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-    private val exampleCounter = intPreferencesKey("travel_mode")
 
     private fun explanationMessage(permission: String): String {
         val baseMessage = """
@@ -97,16 +93,6 @@ class MainActivity : ComponentActivity() {
         return string.substring(0, 1).uppercase() + string.substring(1).lowercase()
     }
 
-    private fun indexToTravelMode(index: Int): TravelMode {
-        return when(index) {
-            0 -> TravelMode.WALKING
-            1 -> TravelMode.TRANSIT
-            2 -> TravelMode.BICYCLING
-            3 -> TravelMode.DRIVING
-            else -> throw Exception("Unknown travel mode")
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -126,15 +112,14 @@ class MainActivity : ComponentActivity() {
                 .map { capitalizeFirstLetter(it.toString()) }
         )
 
-        val exampleCounterFlow: Flow<Int> = dataStore.data.map { preferences -> preferences[exampleCounter] ?: 0 }
-        val travelModeIndex = runBlocking { exampleCounterFlow.first() }
-        locationCapturingManager.travelMode = indexToTravelMode(travelModeIndex);
-        travelModeSpinner.setSelection(travelModeIndex)
+
+        LocationCapturingManager.restore(this)
+        travelModeSpinner.setSelection(travelModeToIndex(locationCapturingManager.travelMode))
 
         travelModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                runBlocking { dataStore.edit { settings -> settings[exampleCounter] = position } }
                 locationCapturingManager.travelMode = indexToTravelMode(position)
+                LocationCapturingManager.flushChanges(this@MainActivity)
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>?) {
