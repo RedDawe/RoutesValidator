@@ -15,7 +15,6 @@ import androidx.work.WorkerParameters
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import com.google.maps.model.TravelMode
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +68,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
             Manifest.permission.ACCESS_BACKGROUND_LOCATION
         ).filter { ActivityCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED }
         if (missingPermissions.isNotEmpty()) {
-            locationCapturingManager!!.mainActivity?.removedCorePermissionCallback()
+            locationCapturingManager!!.mainActivity?.runOnUiThread { locationCapturingManager!!.mainActivity?.removedCorePermissionCallback() }
             return false
         }
         return true
@@ -77,6 +76,19 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
 
     @SuppressLint("MissingPermission")
     private fun captureLocation() {
+//        val a = Coordinate(38.8976, -77.0366)
+//        val b = Coordinate(39.9496, -75.1503)
+//        val c1 = Coordinate(40.689361, -74.044705)
+//        val c2 = Coordinate(40.689426, -74.044542)
+//        val d = Coordinate(40.703996, -74.064266)
+//        appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1)), context)
+//        appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2)), context)
+//        appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d)), context)
+//        appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d, c1, c2, d)), context)
+//        appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d, c1, c2, d, c1)), context)
+//        locationCapturingManager!!.mainActivity?.runOnUiThread { locationCapturingManager!!.mainActivity?.addedNewSuspectedRouteCallback() }
+
+
         if (!checkCorePermission()) return
         fusedLocationClient!!.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
             if (location != null) {
@@ -100,8 +112,8 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         if (potentialRoute != null &&
             !isRouteShortest(potentialRoute, mapsAPIConnector!!.fetchOptimalWaypointsForRoute(potentialRoute, locationCapturingManager!!.travelMode))
         ) {
-            appendSuspectedRoute(potentialRoute, context)
-            locationCapturingManager!!.mainActivity?.addedNewSuspectedRouteCallback()
+            appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, potentialRoute, context)
+            locationCapturingManager!!.mainActivity?.runOnUiThread { locationCapturingManager!!.mainActivity?.addedNewSuspectedRouteCallback() }
         }
     }
 }

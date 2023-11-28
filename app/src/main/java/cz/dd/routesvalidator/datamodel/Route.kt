@@ -17,10 +17,10 @@ class Route(
             .append(destination)
             .append(",")
             .append(finishTime)
-//        for (waypoint in waypoints) { // TODO: prettier solution
-//            stringBuilder.append(",")
-//            stringBuilder.append(waypoint)
-//        }
+        for (waypoint in waypoints) {
+            stringBuilder.append(",")
+            stringBuilder.append(waypoint)
+        }
         stringBuilder.append(System.lineSeparator())
         return stringBuilder.toString()
     }

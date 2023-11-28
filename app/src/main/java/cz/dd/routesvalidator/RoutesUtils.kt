@@ -10,7 +10,8 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-private const val SUSPECTED_ROUTES_FILE_NAME = "suspectedRoutes.csv"
+const val SUSPECTED_ROUTES_FILE_NAME = "suspectedRoutes.csv"
+const val TO_BE_PROCESSES_ROUTES_FILE_NAME = "toBeProcessedRoutes.csv"
 
 fun isRouteShortest(route: Route, optimalWaypoints: List<Coordinate>): Boolean {
     for (optimalWaypoint in optimalWaypoints) {
@@ -42,10 +43,10 @@ fun calculateDistanceKilometers(placeA: Coordinate, placeB: Coordinate): Double 
     return 2 * EARTH_RADIUS_KILOMETERS * asin(sqrt(haversine))
 }
 
-fun appendSuspectedRoute(route: Route, context: Context) {
-    val existingSuspectedRoutes = loadSuspectedRoutes(context)
+fun appendSuspectedRoute(fileName: String, route: Route, context: Context) {
+    val existingSuspectedRoutes = loadSuspectedRoutes(fileName, context)
 
-    context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
+    context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
         for (existingSuspectedRoute in existingSuspectedRoutes) {
             it.write(existingSuspectedRoute.csvLine().toByteArray())
         }
@@ -53,23 +54,25 @@ fun appendSuspectedRoute(route: Route, context: Context) {
     }
 }
 
-fun resetFile(context: Context) {
-    context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
+fun resetFile(fileName: String, context: Context) {
+    context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
         it.write(System.lineSeparator().toByteArray())
     }
 }
 
-fun loadSuspectedRoutes(context: Context): List<Route> {
-    if (!context.fileList().contains(SUSPECTED_ROUTES_FILE_NAME)) return emptyList()
+fun loadSuspectedRoutes(fileName: String, context: Context): List<Route> {
+    if (!context.fileList().contains(fileName)) return emptyList()
 
     val routes = mutableListOf<Route>()
-    for (line in context.openFileInput(SUSPECTED_ROUTES_FILE_NAME).bufferedReader().readLines()) {
+    for (line in context.openFileInput(fileName).bufferedReader().readLines()) {
         if (line.isBlank()) return emptyList()
         val valueList = line.trim().split(",")
         val waypoints = mutableListOf<Coordinate>()
-        for (i in 5 until valueList.size - 1) {
+
+        for (i in 5 until valueList.size - 1 step 2) {
             waypoints.add(Coordinate(valueList[i].toDouble(), valueList[i + 1].toDouble()))
         }
+
         routes.add(
             Route(
                 Coordinate(valueList[0].toDouble(), valueList[1].toDouble()),
@@ -83,10 +86,10 @@ fun loadSuspectedRoutes(context: Context): List<Route> {
     return routes
 }
 
-fun deleteMatchingRoutes(route: Route, context: Context) {
-    val existingSuspectedRoutes = loadSuspectedRoutes(context)
+fun deleteMatchingRoutes(fileName: String, route: Route, context: Context) {
+    val existingSuspectedRoutes = loadSuspectedRoutes(fileName, context)
 
-    context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
+    context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
         for (existingSuspectedRoute in existingSuspectedRoutes) {
             if (existingSuspectedRoute != route) {
                 it.write(existingSuspectedRoute.csvLine().toByteArray())

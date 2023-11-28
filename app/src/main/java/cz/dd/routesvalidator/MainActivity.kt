@@ -24,11 +24,9 @@ import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.maps.model.TravelMode
-import java.time.LocalDateTime
 
 
 private const val NEW_ROUTE_NOTIFICATION_CHANNEL_ID = "NEW_SUSPECTED_ROUTE_ADDED"
@@ -89,6 +87,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        resetFile(SUSPECTED_ROUTES_FILE_NAME, this)
 
         waypointsManager = WaypointsManager.getInstance(this)
         locationCapturingManager = LocationCapturingManager.getInstance()
@@ -174,7 +174,7 @@ class MainActivity : ComponentActivity() {
         val suspectedRoutesView = findViewById<LinearLayout>(R.id.suspectedRoutes)
         suspectedRoutesView.removeAllViews()
 
-        val suspectedRoutes = loadSuspectedRoutes(this)
+        val suspectedRoutes = loadSuspectedRoutes(SUSPECTED_ROUTES_FILE_NAME, this)
         for (route in suspectedRoutes) {
             val buttonsPair = LinearLayout(this)
             buttonsPair.orientation = LinearLayout.HORIZONTAL
@@ -198,7 +198,7 @@ class MainActivity : ComponentActivity() {
             val deleteButton = ImageButton(this)
             deleteButton.setBackgroundResource(R.drawable.delete)
             deleteButton.setOnClickListener {
-                deleteMatchingRoutes(route, this)
+                deleteMatchingRoutes(SUSPECTED_ROUTES_FILE_NAME, route, this)
                 suspectedRoutesView.removeView(buttonsPair)
             }
             buttonsPair.addView(deleteButton)
