@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import androidx.core.app.ActivityCompat
 import androidx.work.CoroutineWorker
-import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -16,8 +15,8 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
-import java.time.LocalDateTime
-import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private const val LOCATION_CAPTURE_TAG = "LOCATION_CAPTURE_TAG"
 
@@ -35,13 +34,16 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         mapsAPIConnector = MapsAPIConnector.getInstance()
 
         if (locationCapturingManager.keepCapturing) {
-            if (WorkManager.getInstance(context).getWorkInfosByTag(LOCATION_CAPTURE_TAG).get().any {it.state == androidx.work.WorkInfo.State.ENQUEUED }) {
+            val anyOtherWorkerScheduled = withContext(Dispatchers.IO) {
+                WorkManager.getInstance(context).getWorkInfosByTag(LOCATION_CAPTURE_TAG).get()
+            }.any { it.state == androidx.work.WorkInfo.State.ENQUEUED }
+            if (anyOtherWorkerScheduled) {
                 return Result.success()
             }
 
             val nextLocationCapture: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                 .setInitialDelay(WAYPOINT_LOCATION_CAPTURE_DELAY)
-                .addTag("1")
+                .addTag(LOCATION_CAPTURE_TAG)
                 .build()
             WorkManager.getInstance(context).enqueue(nextLocationCapture)
 
