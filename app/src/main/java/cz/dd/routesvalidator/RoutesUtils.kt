@@ -67,7 +67,7 @@ fun loadSuspectedRoutes(context: Context): List<Route> {
         if (line.isBlank()) return emptyList()
         val valueList = line.trim().split(",")
         val waypoints = mutableListOf<Coordinate>()
-        for (i in 5 until valueList.size) {
+        for (i in 5 until valueList.size - 1) {
             waypoints.add(Coordinate(valueList[i].toDouble(), valueList[i + 1].toDouble()))
         }
         routes.add(
