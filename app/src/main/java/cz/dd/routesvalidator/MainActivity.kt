@@ -139,7 +139,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         LocationCapturingManager.restore(this)
-        trackingSwitch?.isChecked = locationCapturingManager?.keepCapturing
+        trackingSwitch?.isChecked = locationCapturingManager?.keepCapturing == true
 
         val helpButton = findViewById<Button>(R.id.hintButton)
         helpButton.setOnClickListener() {
