@@ -36,7 +36,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
             waypointsManager = WaypointsManager.getInstance()
             mapsAPIConnector = MapsAPIConnector.getInstance()
 
-            if (locationCapturingManager?.keepCapturing == true) {
+            if (locationCapturingManager!!.keepCapturing) {
                 val nextLocationCapture: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                     .setInitialDelay(WAYPOINT_LOCATION_CAPTURE_DELAY)
                     .build()
@@ -60,7 +60,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
             Manifest.permission.ACCESS_BACKGROUND_LOCATION
         ).filter { ActivityCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED }
         if (missingPermissions.isNotEmpty()) {
-            locationCapturingManager?.mainActivity?.removedCorePermissionCallback()
+            locationCapturingManager!!.mainActivity?.removedCorePermissionCallback()
             return false
         }
         return true
@@ -69,9 +69,9 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     @SuppressLint("MissingPermission")
     private fun captureLocation() {
         if (!checkCorePermission()) return
-        fusedLocationClient?.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)?.addOnSuccessListener { location: Location? ->
+        fusedLocationClient!!.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
             if (location != null) {
-                processPotentialRoute(waypointsManager?.processWaypoint(Coordinate(location.latitude, location.longitude)))
+                processPotentialRoute(waypointsManager!!.processWaypoint(Coordinate(location.latitude, location.longitude)))
             }
         }
     }
@@ -79,21 +79,20 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     @SuppressLint("MissingPermission")
     private fun captureLocationAndFinishCapturing() {
         if (!checkCorePermission()) return
-        fusedLocationClient?.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)?.addOnSuccessListener { location: Location? ->
+        fusedLocationClient!!.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
             if (location != null) {
-                processPotentialRoute(waypointsManager?.processWaypoint(Coordinate(location.latitude, location.longitude)))
-                processPotentialRoute(waypointsManager?.finishAddingWaypoints())
+                processPotentialRoute(waypointsManager!!.processWaypoint(Coordinate(location.latitude, location.longitude)))
+                processPotentialRoute(waypointsManager!!.finishAddingWaypoints())
             }
         }
     }
 
     private fun processPotentialRoute(potentialRoute: Route?) {
-        if (potentialRoute != null) {
-            val optimalWaypoints = mapsAPIConnector?.fetchOptimalWaypointsForRoute(potentialRoute, locationCapturingManager?.travelMode ?: TravelMode.WALKING)
-            if (optimalWaypoints != null && !isRouteShortest(potentialRoute, optimalWaypoints)) {
-                appendSuspectedRoute(potentialRoute, context)
-                locationCapturingManager?.mainActivity?.addedNewSuspectedRouteCallback()
-            }
+        if (potentialRoute != null &&
+            !isRouteShortest(potentialRoute, mapsAPIConnector!!.fetchOptimalWaypointsForRoute(potentialRoute, locationCapturingManager!!.travelMode))
+        ) {
+            appendSuspectedRoute(potentialRoute, context)
+            locationCapturingManager!!.mainActivity?.addedNewSuspectedRouteCallback()
         }
     }
 }
