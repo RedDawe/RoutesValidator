@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import androidx.core.app.ActivityCompat
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -34,8 +35,9 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         if (locationCapturingManager.keepCapturing) {
             val nextLocationCapture: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                 .setInitialDelay(WAYPOINT_LOCATION_CAPTURE_DELAY)
+                .addTag(LOCATION_CAPTURE_TAG)
                 .build()
-            WorkManager.getInstance(context).enqueue(nextLocationCapture)
+            WorkManager.getInstance(context).enqueueUniqueWork(LOCATION_CAPTURE_WORK_NAME, ExistingWorkPolicy.KEEP, nextLocationCapture)
 
             captureLocation()
         } else {

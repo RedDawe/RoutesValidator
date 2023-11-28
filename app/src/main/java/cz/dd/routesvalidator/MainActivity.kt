@@ -29,7 +29,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkInfo.State.ENQUEUED
+import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkManager
 import com.google.maps.model.TravelMode
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +45,10 @@ import kotlinx.coroutines.runBlocking
 private const val NEW_ROUTE_NOTIFICATION_CHANNEL_ID = "NEW_SUSPECTED_ROUTE_ADDED"
 
 private const val CORE_PERMISSION_REMOVED_CHANNEL_ID = "CORE_PERMISSION_REMOVED"
+
+const val LOCATION_CAPTURE_TAG = "LOCATION_CAPTURE_TAG"
+
+const val LOCATION_CAPTURE_WORK_NAME = "LOCATION_CAPTURE_WORK_NAME"
 
 @SuppressLint("UseSwitchCompatOrMaterialCode")
 class MainActivity : ComponentActivity() {
@@ -131,16 +139,21 @@ class MainActivity : ComponentActivity() {
         trackingSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 if (requestCorePermissions()) {
-                    waypointsManager.reset(this)
                     val locationCaptureRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
+                        .addTag(LOCATION_CAPTURE_TAG)
                         .build()
+                    waypointsManager.reset(this)
                     locationCapturingManager.keepCapturing = true
-                    WorkManager.getInstance(this).enqueue(locationCaptureRequest)
+                    LocationCapturingManager.flushChanges(this@MainActivity)
+                    WorkManager.getInstance(this).enqueueUniqueWork(LOCATION_CAPTURE_WORK_NAME, ExistingWorkPolicy.KEEP, locationCaptureRequest)
                 }
             } else {
                 locationCapturingManager.keepCapturing = false
+                LocationCapturingManager.flushChanges(this@MainActivity)
             }
         }
+        LocationCapturingManager.restore(this)
+        trackingSwitch.isChecked = locationCapturingManager.keepCapturing
 
         val helpButton = findViewById<Button>(R.id.hintButton)
         helpButton.setOnClickListener() {
@@ -182,6 +195,7 @@ class MainActivity : ComponentActivity() {
                 .append(route.finishTime.toLocalTime())
                 .toString()
             openMapsButton.setOnClickListener {
+                LocationCapturingManager.restore(this@MainActivity)
                 val gmmIntentUri =
                     Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + route.origin + "&destination="
                             + route.destination + "&travelmode=" + locationCapturingManager.travelMode.toString().lowercase())
@@ -276,6 +290,7 @@ class MainActivity : ComponentActivity() {
     fun removedCorePermissionCallback() {
         trackingSwitch.isChecked = false
         locationCapturingManager.keepCapturing = false
+        LocationCapturingManager.flushChanges(this@MainActivity)
 
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // TODO: which?
