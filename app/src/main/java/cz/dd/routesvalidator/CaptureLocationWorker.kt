@@ -38,14 +38,13 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
             waypointsManager = WaypointsManager.getInstance(context)
             mapsAPIConnector = MapsAPIConnector.getInstance()
 
-            if (locationCapturingManager?.keepCapturing == true) {
+            if (locationCapturingManager!!.keepCapturing) {
                 val anyOtherWorkerScheduled = withContext(Dispatchers.IO) {
                     WorkManager.getInstance(context).getWorkInfosByTag(LOCATION_CAPTURE_TAG).get()
                 }.any { it.state == androidx.work.WorkInfo.State.ENQUEUED }
                 if (anyOtherWorkerScheduled) {
                     return Result.success()
                 }
-
                 val nextLocationCapture: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                     .setInitialDelay(WAYPOINT_LOCATION_CAPTURE_DELAY)
                     .addTag(LOCATION_CAPTURE_TAG)
@@ -70,7 +69,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
             Manifest.permission.ACCESS_BACKGROUND_LOCATION
         ).filter { ActivityCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED }
         if (missingPermissions.isNotEmpty()) {
-            locationCapturingManager?.mainActivity?.removedCorePermissionCallback()
+            locationCapturingManager!!.mainActivity?.removedCorePermissionCallback()
             return false
         }
         return true
@@ -79,9 +78,9 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     @SuppressLint("MissingPermission")
     private fun captureLocation() {
         if (!checkCorePermission()) return
-        fusedLocationClient?.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)?.addOnSuccessListener { location: Location? ->
+        fusedLocationClient!!.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
             if (location != null) {
-                processPotentialRoute(waypointsManager?.processWaypoint(Coordinate(location.latitude, location.longitude), context))
+                processPotentialRoute(waypointsManager!!.processWaypoint(Coordinate(location.latitude, location.longitude), context))
             }
         }
     }
@@ -89,21 +88,20 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     @SuppressLint("MissingPermission")
     private fun captureLocationAndFinishCapturing() {
         if (!checkCorePermission()) return
-        fusedLocationClient?.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)?.addOnSuccessListener { location: Location? ->
+        fusedLocationClient!!.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
             if (location != null) {
-                processPotentialRoute(waypointsManager?.processWaypoint(Coordinate(location.latitude, location.longitude), context))
-                processPotentialRoute(waypointsManager?.finishAddingWaypoints(context))
+                processPotentialRoute(waypointsManager!!.processWaypoint(Coordinate(location.latitude, location.longitude), context))
+                processPotentialRoute(waypointsManager!!.finishAddingWaypoints(context))
             }
         }
     }
 
     private fun processPotentialRoute(potentialRoute: Route?) {
-        if (potentialRoute != null) {
-            val optimalWaypoints = mapsAPIConnector?.fetchOptimalWaypointsForRoute(potentialRoute, locationCapturingManager?.travelMode ?: TravelMode.WALKING)
-            if (optimalWaypoints != null && !isRouteShortest(potentialRoute, optimalWaypoints)) {
-                appendSuspectedRoute(potentialRoute, context)
-                locationCapturingManager?.mainActivity?.addedNewSuspectedRouteCallback()
-            }
+        if (potentialRoute != null &&
+            !isRouteShortest(potentialRoute, mapsAPIConnector!!.fetchOptimalWaypointsForRoute(potentialRoute, locationCapturingManager!!.travelMode))
+        ) {
+            appendSuspectedRoute(potentialRoute, context)
+            locationCapturingManager!!.mainActivity?.addedNewSuspectedRouteCallback()
         }
     }
 }
