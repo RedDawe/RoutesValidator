@@ -151,9 +151,11 @@ class MainActivity : ComponentActivity() {
                         .build()
                     locationCapturingManager?.keepCapturing = true
                     WorkManager.getInstance(this).enqueue(locationCaptureRequest)
+                    travelModeSpinner?.isEnabled = false
                 }
             } else {
                 locationCapturingManager?.keepCapturing = false
+                travelModeSpinner?.isEnabled = true
             }
         }
 
