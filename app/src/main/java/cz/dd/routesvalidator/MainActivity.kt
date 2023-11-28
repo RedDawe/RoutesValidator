@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        waypointsManager = WaypointsManager.getInstance()
+        waypointsManager = WaypointsManager.getInstance(this)
         locationCapturingManager = LocationCapturingManager.getInstance()
         mapsAPIConnector = MapsAPIConnector.getInstance()
 
@@ -107,7 +107,10 @@ class MainActivity : ComponentActivity() {
         )
 
         LocationCapturingManager.restore(this)
-        travelModeSpinner.setSelection(travelModeToIndex(locationCapturingManager.travelMode))
+        val travelMode = locationCapturingManager?.travelMode
+        if (travelMode != null) {
+            travelModeSpinner?.setSelection(travelModeToIndex(travelMode))
+        }
 
         travelModeSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
