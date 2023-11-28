@@ -38,12 +38,12 @@ private const val CORE_PERMISSION_REMOVED_CHANNEL_ID = "CORE_PERMISSION_REMOVED"
 @SuppressLint("UseSwitchCompatOrMaterialCode")
 class MainActivity : ComponentActivity() {
 
-    private lateinit var waypointsManager: WaypointsManager
-    private lateinit var locationCapturingManager: LocationCapturingManager
-    private lateinit var mapsAPIConnector: MapsAPIConnector
+    private var waypointsManager: WaypointsManager? = null
+    private var locationCapturingManager: LocationCapturingManager? = null
+    private var mapsAPIConnector: MapsAPIConnector? = null
 
-    private lateinit var trackingSwitch: Switch
-    private lateinit var travelModeSpinner: Spinner
+    private var trackingSwitch: Switch? = null
+    private var travelModeSpinner: Spinner? = null
 
     private fun explanationMessage(permission: String): String {
         val baseMessage = """
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
             .setTitle("Core Permission Needed")
             .setMessage(explanationMessage(missingPermission))
             .setPositiveButton("OK") { _, _ ->
-                trackingSwitch.isChecked = false
+                trackingSwitch?.isChecked = false
                 ActivityCompat.requestPermissions(this, arrayOf(missingPermission), 0)
             }
             .create()
@@ -90,28 +90,28 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        waypointsManager = WaypointsManager.getInstance(this)
+        waypointsManager = WaypointsManager.getInstance()
         locationCapturingManager = LocationCapturingManager.getInstance()
         mapsAPIConnector = MapsAPIConnector.getInstance()
 
+        travelModeSpinner = findViewById(R.id.spinner)
+        trackingSwitch = findViewById(R.id.trackingSwitch)
 
-        locationCapturingManager.mainActivity = this
+        locationCapturingManager?.mainActivity = this
         createNotificationChannels()
         requestNotificationPermission()
 
-        travelModeSpinner = findViewById(R.id.spinner)
-        travelModeSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
+        travelModeSpinner?.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
             listOf(TravelMode.WALKING, TravelMode.TRANSIT, TravelMode.BICYCLING, TravelMode.DRIVING)
                 .map { capitalizeFirstLetter(it.toString()) }
         )
 
-
         LocationCapturingManager.restore(this)
         travelModeSpinner.setSelection(travelModeToIndex(locationCapturingManager.travelMode))
 
-        travelModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        travelModeSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                locationCapturingManager.travelMode = indexToTravelMode(position)
+                locationCapturingManager?.travelMode = indexToTravelMode(position)
                 LocationCapturingManager.flushChanges(this@MainActivity)
             }
 
@@ -120,24 +120,26 @@ class MainActivity : ComponentActivity() {
         }
 
 
-        trackingSwitch = findViewById(R.id.trackingSwitch)
-        trackingSwitch.setOnCheckedChangeListener { _, isChecked ->
+        trackingSwitch?.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 if (requestCorePermissions()) {
                     val locationCaptureRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                         .build()
-                    waypointsManager.reset(this)
-                    locationCapturingManager.keepCapturing = true
+                    locationCapturingManager?.keepCapturing = true
+                    waypointsManager?.reset(this)
+                    locationCapturingManager?.keepCapturing = true
                     LocationCapturingManager.flushChanges(this@MainActivity)
                     WorkManager.getInstance(this).enqueue(locationCaptureRequest)
+                    travelModeSpinner?.isEnabled = false
                 }
             } else {
-                locationCapturingManager.keepCapturing = false
+                locationCapturingManager?.keepCapturing = false
                 LocationCapturingManager.flushChanges(this@MainActivity)
+                travelModeSpinner?.isEnabled = true
             }
         }
         LocationCapturingManager.restore(this)
-        trackingSwitch.isChecked = locationCapturingManager.keepCapturing
+        trackingSwitch?.isChecked = locationCapturingManager?.keepCapturing
 
         val helpButton = findViewById<Button>(R.id.hintButton)
         helpButton.setOnClickListener() {
@@ -148,7 +150,9 @@ class MainActivity : ComponentActivity() {
                     
                     1. The application expects internet connection while tracking is turned on
                     
-                    2. Please only change travel mode while tracking is turned off
+                    2. Changing travel mode is allowed only while tracking is turned off
+                    
+                    3. It is recommended to not use too many other applications while tracking is turned on especially on devices with lower ram memory
                 """.trimIndent())
                 .setPositiveButton("OK") { _, _ -> }
                 .create()
@@ -182,7 +186,7 @@ class MainActivity : ComponentActivity() {
                 LocationCapturingManager.restore(this@MainActivity)
                 val gmmIntentUri =
                     Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + route.origin + "&destination="
-                            + route.destination + "&travelmode=" + locationCapturingManager.travelMode.toString().lowercase())
+                            + route.destination + "&travelmode=" + locationCapturingManager?.travelMode.toString().lowercase())
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 startActivity(mapIntent)
             }
@@ -263,7 +267,7 @@ class MainActivity : ComponentActivity() {
                 .setTitle("Option to turn on notifications")
                 .setMessage(explanationMessage("This application can notify you when a new suspected not optimal route has been found."))
                 .setPositiveButton("OK") { _, _ ->
-                    trackingSwitch.isChecked = false
+                    trackingSwitch?.isChecked = false
                     ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
                 }
                 .create()
@@ -272,8 +276,8 @@ class MainActivity : ComponentActivity() {
     }
 
     fun removedCorePermissionCallback() {
-        trackingSwitch.isChecked = false
-        locationCapturingManager.keepCapturing = false
+        trackingSwitch?.isChecked = false
+        locationCapturingManager?.keepCapturing = false
         LocationCapturingManager.flushChanges(this@MainActivity)
 
         val intent = Intent(this, MainActivity::class.java).apply {
