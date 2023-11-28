@@ -168,7 +168,9 @@ class MainActivity : ComponentActivity() {
                     
                     1. The application expects internet connection while tracking is turned on
                     
-                    2. Please only change travel mode while tracking is turned off
+                    2. Changing travel mode is allowed only while tracking is turned off
+                    
+                    3. It is recommended to not use too many other applications while tracking is turned on especially on devices with lower ram memory
                 """.trimIndent())
                 .setPositiveButton("OK") { _, _ -> }
                 .create()
