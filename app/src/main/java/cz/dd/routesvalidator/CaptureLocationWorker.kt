@@ -19,6 +19,8 @@ import cz.dd.routesvalidator.datamodel.Route
 import java.time.LocalDateTime
 import kotlin.random.Random
 
+private const val LOCATION_CAPTURE_TAG = "LOCATION_CAPTURE_TAG"
+
 class CaptureLocationWorker(private val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams) {
 
@@ -33,11 +35,15 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         mapsAPIConnector = MapsAPIConnector.getInstance()
 
         if (locationCapturingManager.keepCapturing) {
+            if (WorkManager.getInstance(context).getWorkInfosByTag(LOCATION_CAPTURE_TAG).get().any {it.state == androidx.work.WorkInfo.State.ENQUEUED }) {
+                return Result.success()
+            }
+
             val nextLocationCapture: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
                 .setInitialDelay(WAYPOINT_LOCATION_CAPTURE_DELAY)
-                .addTag(LOCATION_CAPTURE_TAG)
+                .addTag("1")
                 .build()
-            WorkManager.getInstance(context).enqueueUniqueWork(LOCATION_CAPTURE_WORK_NAME, ExistingWorkPolicy.KEEP, nextLocationCapture)
+            WorkManager.getInstance(context).enqueue(nextLocationCapture)
 
             captureLocation()
         } else {

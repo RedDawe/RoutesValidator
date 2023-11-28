@@ -24,31 +24,16 @@ import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkInfo.State.ENQUEUED
-import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkManager
 import com.google.maps.model.TravelMode
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
+import java.time.LocalDateTime
 
 
 private const val NEW_ROUTE_NOTIFICATION_CHANNEL_ID = "NEW_SUSPECTED_ROUTE_ADDED"
 
 private const val CORE_PERMISSION_REMOVED_CHANNEL_ID = "CORE_PERMISSION_REMOVED"
-
-const val LOCATION_CAPTURE_TAG = "LOCATION_CAPTURE_TAG"
-
-const val LOCATION_CAPTURE_WORK_NAME = "LOCATION_CAPTURE_WORK_NAME"
 
 @SuppressLint("UseSwitchCompatOrMaterialCode")
 class MainActivity : ComponentActivity() {
@@ -140,12 +125,11 @@ class MainActivity : ComponentActivity() {
             if (isChecked) {
                 if (requestCorePermissions()) {
                     val locationCaptureRequest = OneTimeWorkRequestBuilder<CaptureLocationWorker>()
-                        .addTag(LOCATION_CAPTURE_TAG)
                         .build()
                     waypointsManager.reset(this)
                     locationCapturingManager.keepCapturing = true
                     LocationCapturingManager.flushChanges(this@MainActivity)
-                    WorkManager.getInstance(this).enqueueUniqueWork(LOCATION_CAPTURE_WORK_NAME, ExistingWorkPolicy.KEEP, locationCaptureRequest)
+                    WorkManager.getInstance(this).enqueue(locationCaptureRequest)
                 }
             } else {
                 locationCapturingManager.keepCapturing = false
