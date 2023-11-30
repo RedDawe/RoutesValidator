@@ -20,7 +20,6 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Switch
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -162,7 +161,7 @@ class MainActivity : ComponentActivity() {
         val helpButton = findViewById<Button>(R.id.hintButton)
         helpButton.setOnClickListener() {
             AlertDialog.Builder(this)
-                .setTitle("Hints")
+                .setTitle("Hints (v%s:%s)".format(BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME))
                 .setMessage("""
                     Please note few important things while using the application:
                     
