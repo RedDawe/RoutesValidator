@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        resetFile(SUSPECTED_ROUTES_FILE_NAME, this)
+//        resetFile(SUSPECTED_ROUTES_FILE_NAME, this)
 
         waypointsManager = WaypointsManager.getInstance(this)
         locationCapturingManager = LocationCapturingManager.getInstance()
