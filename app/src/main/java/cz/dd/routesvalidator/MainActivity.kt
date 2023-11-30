@@ -147,7 +147,7 @@ class MainActivity : ComponentActivity() {
         val helpButton = findViewById<Button>(R.id.hintButton)
         helpButton.setOnClickListener() {
             AlertDialog.Builder(this)
-                .setTitle("Hints")
+                .setTitle("Hints (v%s:%s)".format(BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME))
                 .setMessage("""
                     Please note few important things while using the application:
                     
