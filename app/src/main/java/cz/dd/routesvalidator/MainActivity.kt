@@ -174,7 +174,7 @@ class MainActivity : ComponentActivity() {
         val suspectedRoutesView = findViewById<LinearLayout>(R.id.suspectedRoutes)
         suspectedRoutesView.removeAllViews()
 
-        val suspectedRoutes = loadSuspectedRoutes(SUSPECTED_ROUTES_FILE_NAME, this)
+        val suspectedRoutes = loadRoutes(SUSPECTED_ROUTES_FILE_NAME, this)
         for (route in suspectedRoutes) {
             val buttonsPair = LinearLayout(this)
             buttonsPair.orientation = LinearLayout.HORIZONTAL
@@ -311,5 +311,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 }

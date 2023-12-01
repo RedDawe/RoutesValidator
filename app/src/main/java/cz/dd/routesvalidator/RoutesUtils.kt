@@ -43,8 +43,8 @@ fun calculateDistanceKilometers(placeA: Coordinate, placeB: Coordinate): Double 
     return 2 * EARTH_RADIUS_KILOMETERS * asin(sqrt(haversine))
 }
 
-fun appendSuspectedRoute(fileName: String, route: Route, context: Context) {
-    val existingSuspectedRoutes = loadSuspectedRoutes(fileName, context)
+fun appendRoute(fileName: String, route: Route, context: Context) {
+    val existingSuspectedRoutes = loadRoutes(fileName, context)
 
     context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
         for (existingSuspectedRoute in existingSuspectedRoutes) {
@@ -60,7 +60,7 @@ fun resetFile(fileName: String, context: Context) {
     }
 }
 
-fun loadSuspectedRoutes(fileName: String, context: Context): List<Route> {
+fun loadRoutes(fileName: String, context: Context): List<Route> {
     if (!context.fileList().contains(fileName)) return emptyList()
 
     val routes = mutableListOf<Route>()
@@ -87,7 +87,7 @@ fun loadSuspectedRoutes(fileName: String, context: Context): List<Route> {
 }
 
 fun deleteMatchingRoutes(fileName: String, route: Route, context: Context) {
-    val existingSuspectedRoutes = loadSuspectedRoutes(fileName, context)
+    val existingSuspectedRoutes = loadRoutes(fileName, context)
 
     context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
         for (existingSuspectedRoute in existingSuspectedRoutes) {

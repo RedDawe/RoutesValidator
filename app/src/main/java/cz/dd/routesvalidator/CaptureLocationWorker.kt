@@ -109,11 +109,19 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
     }
 
     private fun processPotentialRoute(potentialRoute: Route?) {
-        if (potentialRoute != null &&
-            !isRouteShortest(potentialRoute, mapsAPIConnector!!.fetchOptimalWaypointsForRoute(potentialRoute, locationCapturingManager!!.travelMode))
-        ) {
-            appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, potentialRoute, context)
-            locationCapturingManager!!.mainActivity?.runOnUiThread { locationCapturingManager!!.mainActivity?.addedNewSuspectedRouteCallback() }
+        if (potentialRoute == null) return
+
+        val optimalWaypoints: List<Coordinate>
+        try {
+            optimalWaypoints = mapsAPIConnector!!.fetchOptimalWaypointsForRoute(potentialRoute, locationCapturingManager!!.travelMode)
+        } catch (e: Exception) {
+            appendRoute(TO_BE_PROCESSES_ROUTES_FILE_NAME, potentialRoute, context)
+            return
         }
+
+        if (isRouteShortest(potentialRoute, optimalWaypoints)) return
+
+        appendRoute(SUSPECTED_ROUTES_FILE_NAME, potentialRoute, context)
+        locationCapturingManager!!.mainActivity?.runOnUiThread { locationCapturingManager!!.mainActivity?.addedNewSuspectedRouteCallback() }
     }
 }
