@@ -76,16 +76,17 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
 
     @SuppressLint("MissingPermission")
     private fun captureLocation() {
+        // TODO: Remove debugging code
 //        val a = Coordinate(38.8976, -77.0366)
 //        val b = Coordinate(39.9496, -75.1503)
 //        val c1 = Coordinate(40.689361, -74.044705)
 //        val c2 = Coordinate(40.689426, -74.044542)
 //        val d = Coordinate(40.703996, -74.064266)
-//        appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1)), context)
-//        appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2)), context)
-//        appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d)), context)
-//        appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d, c1, c2, d)), context)
-//        appendSuspectedRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d, c1, c2, d, c1)), context)
+//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1)), context)
+//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2)), context)
+//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d)), context)
+//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d, c1, c2, d)), context)
+//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d, c1, c2, d, c1)), context)
 //        locationCapturingManager!!.mainActivity?.runOnUiThread { locationCapturingManager!!.mainActivity?.addedNewSuspectedRouteCallback() }
 
 

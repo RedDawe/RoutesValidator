@@ -161,6 +161,16 @@ class MainActivity : ComponentActivity() {
                 .create()
                 .show()
         }
+
+        val debugButton = findViewById<Button>(R.id.debugButton)
+        debugButton.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Debug")
+                .setMessage(loadRoutes(SUSPECTED_ROUTES_FILE_NAME, this).toString())
+                .setPositiveButton("OK") { _, _ -> }
+                .create()
+                .show()
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

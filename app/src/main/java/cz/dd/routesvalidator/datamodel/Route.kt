@@ -25,6 +25,8 @@ class Route(
         return stringBuilder.toString()
     }
 
+
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -45,5 +47,9 @@ class Route(
         result = 31 * result + waypoints.hashCode()
         result = 31 * result + finishTime.hashCode()
         return result
+    }
+
+    override fun toString(): String {
+        return "Route(origin=$origin, destination=$destination, waypoints=$waypoints, finishTime=$finishTime)"
     }
 }
