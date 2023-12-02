@@ -117,6 +117,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         val optimalWaypoints: List<Coordinate>
         try {
             optimalWaypoints = mapsAPIConnector!!.fetchOptimalWaypointsForRoute(potentialRoute, locationCapturingManager!!.travelMode)
+            Log.i("CaptureLocationWorker", "Optimal waypoints: $optimalWaypoints")
         } catch (e: Exception) {
             appendRoute(TO_BE_PROCESSES_ROUTES_FILE_NAME, potentialRoute, context)
             return
