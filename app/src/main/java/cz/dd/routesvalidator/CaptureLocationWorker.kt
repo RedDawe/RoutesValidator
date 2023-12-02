@@ -56,7 +56,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
             }
             return Result.success()
         } catch (e: Exception) {
-            Log.e("CaptureLocationWorker", e.message, e)
+            Log.e("CaptureLocationWorker", "Error capturing location", e)
             return Result.success()
         }
     }
@@ -92,6 +92,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         if (!checkCorePermission()) return
         fusedLocationClient!!.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
             if (location != null) {
+                Log.e("CaptureLocationWorker", "Captured location: ${location.latitude}, ${location.longitude}")
                 processPotentialRoute(waypointsManager!!.processWaypoint(Coordinate(location.latitude, location.longitude), context))
             }
         }
@@ -102,6 +103,7 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
         if (!checkCorePermission()) return
         fusedLocationClient!!.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { location: Location? ->
             if (location != null) {
+                Log.e("CaptureLocationWorker", "Captured location: ${location.latitude}, ${location.longitude}")
                 processPotentialRoute(waypointsManager!!.processWaypoint(Coordinate(location.latitude, location.longitude), context))
                 processPotentialRoute(waypointsManager!!.finishAddingWaypoints(context))
             }
