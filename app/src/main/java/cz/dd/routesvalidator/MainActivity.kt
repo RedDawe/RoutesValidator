@@ -88,8 +88,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        resetFile(SUSPECTED_ROUTES_FILE_NAME, this)
-
         waypointsManager = WaypointsManager.getInstance(this)
         locationCapturingManager = LocationCapturingManager.getInstance()
         mapsAPIConnector = MapsAPIConnector.getInstance()
@@ -157,16 +155,6 @@ class MainActivity : ComponentActivity() {
                     
                     3. It is recommended to not use too many other applications while tracking is turned on especially on devices with lower ram memory
                 """.trimIndent())
-                .setPositiveButton("OK") { _, _ -> }
-                .create()
-                .show()
-        }
-
-        val debugButton = findViewById<Button>(R.id.debugButton)
-        debugButton.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("Debug")
-                .setMessage(loadRoutes(SUSPECTED_ROUTES_FILE_NAME, this).toString())
                 .setPositiveButton("OK") { _, _ -> }
                 .create()
                 .show()
