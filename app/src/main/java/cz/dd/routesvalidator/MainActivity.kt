@@ -179,10 +179,7 @@ class MainActivity : ComponentActivity() {
             suspectedRoutesView.addView(buttonsPair)
 
             val openMapsButton = Button(this)
-            openMapsButton.text = StringBuilder().append(route.finishTime.toLocalDate())
-                .append(System.lineSeparator())
-                .append(route.finishTime.toLocalTime())
-                .toString()
+            openMapsButton.text = "Route ending on:${System.lineSeparator()}${dateFormatter.format(route.finishTime)}${System.lineSeparator()}at ${route.finishTime.hour}:${route.finishTime.minute}"
             openMapsButton.setOnClickListener {
                 LocationCapturingManager.restore(this@MainActivity)
                 val gmmIntentUri =

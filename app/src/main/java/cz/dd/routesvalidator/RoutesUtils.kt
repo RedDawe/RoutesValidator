@@ -4,6 +4,7 @@ import android.content.Context
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.pow
@@ -97,3 +98,7 @@ fun deleteMatchingRoutes(fileName: String, route: Route, context: Context) {
         }
     }
 }
+
+val dateFormatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM")
+
+
