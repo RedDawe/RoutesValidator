@@ -278,7 +278,7 @@ class MainActivity : ComponentActivity() {
         ) {
             AlertDialog.Builder(this)
                 .setTitle("Option to turn on notifications")
-                .setMessage(explanationMessage("This application can notify you when a new suspected not optimal route has been found."))
+                .setMessage("This application can notify you when a new suspected not optimal route has been found.")
                 .setPositiveButton("OK") { _, _ ->
                     trackingSwitch?.isChecked = false
                     ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
