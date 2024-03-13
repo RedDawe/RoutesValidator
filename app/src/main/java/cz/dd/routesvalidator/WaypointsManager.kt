@@ -3,12 +3,11 @@ package cz.dd.routesvalidator
 import android.content.Context
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
-import kotlinx.serialization.EncodeDefault
-import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 private const val WAYPOINTS_MANAGER_FILE_NAME = "waypointsManager.json"
 
@@ -98,7 +97,7 @@ class WaypointsManager private constructor(
 
         } else {
             result =
-                Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints, LocalDateTime.now())
+                Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints, LocalDateTime.ofEpochSecond(currentWaypointImmutableCopy.epoch, 0, ZoneOffset.UTC))
             currentWaypoints = mutableListOf()
             lastPlaceOfStay = currentWaypointImmutableCopy
             currentWaypointOccurrences = 1
@@ -117,7 +116,7 @@ class WaypointsManager private constructor(
         val lastPlaceOfStayImmutableCopy = lastPlaceOfStay
         if (currentWaypointImmutableCopy == null || lastPlaceOfStayImmutableCopy == null) return null
         val result =
-            Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints, LocalDateTime.now())
+            Route(lastPlaceOfStayImmutableCopy, currentWaypointImmutableCopy, currentWaypoints, LocalDateTime.ofEpochSecond(currentWaypointImmutableCopy.epoch, 0, ZoneOffset.UTC))
 
         reset(context)
 
