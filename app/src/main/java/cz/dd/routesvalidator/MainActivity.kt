@@ -71,6 +71,7 @@ class MainActivity : ComponentActivity() {
         AlertDialog.Builder(this)
             .setTitle("Core Permission Needed")
             .setMessage(explanationMessage(missingPermission))
+            .setCancelable(false)
             .setPositiveButton("OK") { _, _ ->
                 trackingSwitch?.isChecked = false
                 ActivityCompat.requestPermissions(this, arrayOf(missingPermission), 0)
