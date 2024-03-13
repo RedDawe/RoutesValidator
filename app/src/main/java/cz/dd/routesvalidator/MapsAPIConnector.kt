@@ -31,7 +31,7 @@ class MapsAPIConnector private constructor(): AutoCloseable {
 
         val waypoints = mutableListOf<Coordinate>()
         for (step in directionsResult.routes[0].legs[0].steps) {
-            waypoints.add(Coordinate(step.endLocation.lat, step.endLocation.lng))
+            waypoints.add(Coordinate(step.endLocation.lat, step.endLocation.lng, -1))
         }
         return waypoints
     }

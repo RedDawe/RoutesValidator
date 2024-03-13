@@ -4,13 +4,15 @@ import android.content.Context
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-private const val SUSPECTED_ROUTES_FILE_NAME = "suspectedRoutes.csv"
+const val SUSPECTED_ROUTES_FILE_NAME = "suspectedRoutes.csv"
+const val TO_BE_PROCESSES_ROUTES_FILE_NAME = "toBeProcessedRoutes.csv"
 
 fun isRouteShortest(route: Route, optimalWaypoints: List<Coordinate>): Boolean {
     for (optimalWaypoint in optimalWaypoints) {
@@ -42,10 +44,10 @@ fun calculateDistanceKilometers(placeA: Coordinate, placeB: Coordinate): Double 
     return 2 * EARTH_RADIUS_KILOMETERS * asin(sqrt(haversine))
 }
 
-fun appendSuspectedRoute(route: Route, context: Context) {
-    val existingSuspectedRoutes = loadSuspectedRoutes(context)
+fun appendRoute(fileName: String, route: Route, context: Context) {
+    val existingSuspectedRoutes = loadRoutes(fileName, context)
 
-    context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
+    context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
         for (existingSuspectedRoute in existingSuspectedRoutes) {
             it.write(existingSuspectedRoute.csvLine().toByteArray())
         }
@@ -53,29 +55,31 @@ fun appendSuspectedRoute(route: Route, context: Context) {
     }
 }
 
-fun resetFile(context: Context) {
-    context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
+fun resetFile(fileName: String, context: Context) {
+    context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
         it.write(System.lineSeparator().toByteArray())
     }
 }
 
-fun loadSuspectedRoutes(context: Context): List<Route> {
-    if (!context.fileList().contains(SUSPECTED_ROUTES_FILE_NAME)) return emptyList()
+fun loadRoutes(fileName: String, context: Context): List<Route> {
+    if (!context.fileList().contains(fileName)) return emptyList()
 
     val routes = mutableListOf<Route>()
-    for (line in context.openFileInput(SUSPECTED_ROUTES_FILE_NAME).bufferedReader().readLines()) {
+    for (line in context.openFileInput(fileName).bufferedReader().readLines()) {
         if (line.isBlank()) return emptyList()
         val valueList = line.trim().split(",")
         val waypoints = mutableListOf<Coordinate>()
-        for (i in 5 until valueList.size - 1) {
-            waypoints.add(Coordinate(valueList[i].toDouble(), valueList[i + 1].toDouble()))
+
+        for (i in 7 until valueList.size - 1 step 3) {
+            waypoints.add(Coordinate(valueList[i].toDouble(), valueList[i + 1].toDouble(), valueList[i + 2].toLong()))
         }
+
         routes.add(
             Route(
-                Coordinate(valueList[0].toDouble(), valueList[1].toDouble()),
-                Coordinate(valueList[2].toDouble(), valueList[3].toDouble()),
+                Coordinate(valueList[0].toDouble(), valueList[1].toDouble(), valueList[2].toLong()),
+                Coordinate(valueList[3].toDouble(), valueList[4].toDouble(), valueList[5].toLong()),
                 waypoints,
-                LocalDateTime.parse(valueList[4])
+                LocalDateTime.parse(valueList[6])
             )
         )
     }
@@ -83,10 +87,10 @@ fun loadSuspectedRoutes(context: Context): List<Route> {
     return routes
 }
 
-fun deleteMatchingRoutes(route: Route, context: Context) {
-    val existingSuspectedRoutes = loadSuspectedRoutes(context)
+fun deleteMatchingRoutes(fileName: String, route: Route, context: Context) {
+    val existingSuspectedRoutes = loadRoutes(fileName, context)
 
-    context.openFileOutput(SUSPECTED_ROUTES_FILE_NAME, Context.MODE_PRIVATE).use {
+    context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
         for (existingSuspectedRoute in existingSuspectedRoutes) {
             if (existingSuspectedRoute != route) {
                 it.write(existingSuspectedRoute.csvLine().toByteArray())
@@ -94,3 +98,7 @@ fun deleteMatchingRoutes(route: Route, context: Context) {
         }
     }
 }
+
+val dateFormatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM")
+
+
