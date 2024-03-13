@@ -3,9 +3,10 @@ package cz.dd.routesvalidator.datamodel
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Coordinate(val latitude: Double, val longitude: Double) {
+class Coordinate(val latitude: Double, val longitude: Double, val epoch: Long) {
     override fun toString(): String {
-        return StringBuilder().append(latitude).append(",").append(longitude).toString()
+        return StringBuilder().append(latitude).append(",").append(longitude)
+            .append(",").append(epoch).toString()
     }
 
     override fun equals(other: Any?): Boolean {

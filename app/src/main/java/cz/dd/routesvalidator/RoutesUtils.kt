@@ -70,16 +70,16 @@ fun loadRoutes(fileName: String, context: Context): List<Route> {
         val valueList = line.trim().split(",")
         val waypoints = mutableListOf<Coordinate>()
 
-        for (i in 5 until valueList.size - 1 step 2) {
-            waypoints.add(Coordinate(valueList[i].toDouble(), valueList[i + 1].toDouble()))
+        for (i in 7 until valueList.size - 1 step 3) {
+            waypoints.add(Coordinate(valueList[i].toDouble(), valueList[i + 1].toDouble(), valueList[i + 2].toLong()))
         }
 
         routes.add(
             Route(
-                Coordinate(valueList[0].toDouble(), valueList[1].toDouble()),
-                Coordinate(valueList[2].toDouble(), valueList[3].toDouble()),
+                Coordinate(valueList[0].toDouble(), valueList[1].toDouble(), valueList[2].toLong()),
+                Coordinate(valueList[3].toDouble(), valueList[4].toDouble(), valueList[5].toLong()),
                 waypoints,
-                LocalDateTime.parse(valueList[4])
+                LocalDateTime.parse(valueList[6])
             )
         )
     }
