@@ -194,8 +194,16 @@ class MainActivity : ComponentActivity() {
             val deleteButton = ImageButton(this)
             deleteButton.setBackgroundResource(R.drawable.delete)
             deleteButton.setOnClickListener {
-                deleteMatchingRoutes(SUSPECTED_ROUTES_FILE_NAME, route, this)
-                suspectedRoutesView.removeView(buttonsPair)
+                AlertDialog.Builder(this)
+                    .setTitle("Delete route")
+                    .setMessage("Do you really want to delete this route?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        deleteMatchingRoutes(SUSPECTED_ROUTES_FILE_NAME, route, this)
+                        suspectedRoutesView.removeView(buttonsPair)
+                    }
+                    .setNegativeButton("No") { _, _ -> }
+                    .create()
+                    .show()
             }
             buttonsPair.addView(deleteButton)
         }
