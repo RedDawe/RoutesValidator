@@ -21,6 +21,8 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Switch
 import androidx.activity.ComponentActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -170,14 +172,29 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun reloadSuspectedRoutes() {
-        val suspectedRoutesView = findViewById<LinearLayout>(R.id.suspectedRoutes)
-        suspectedRoutesView.removeAllViews()
-
         val suspectedRoutes = loadRoutes(SUSPECTED_ROUTES_FILE_NAME, this)
+
+        val suspectedRoutesView = findViewById<ConstraintLayout>(R.id.suspectedRoutes)
+        suspectedRoutesView.removeAllViews()
+        val constraintSet = ConstraintSet()
+
+        var topConstrain: LinearLayout? = null
         for (route in suspectedRoutes) {
             val buttonsPair = LinearLayout(this)
             buttonsPair.orientation = LinearLayout.HORIZONTAL
+            buttonsPair.id = View.generateViewId()
+            buttonsPair.minimumHeight = 100
+
             suspectedRoutesView.addView(buttonsPair)
+            constraintSet.clone(suspectedRoutesView)
+            constraintSet.connect(buttonsPair.id, ConstraintSet.LEFT, suspectedRoutesView.id, ConstraintSet.LEFT, 10)
+            constraintSet.connect(buttonsPair.id, ConstraintSet.RIGHT, suspectedRoutesView.id, ConstraintSet.RIGHT, 10)
+            if (topConstrain == null) {
+                constraintSet.connect(buttonsPair.id, ConstraintSet.TOP, suspectedRoutesView.id, ConstraintSet.TOP, 10)
+            } else {
+                constraintSet.connect(buttonsPair.id, ConstraintSet.TOP, topConstrain.id, ConstraintSet.BOTTOM, 10)
+            }
+            topConstrain = buttonsPair
 
             val openMapsButton = Button(this)
             openMapsButton.text = "Route ending on:${System.lineSeparator()}${dateFormatter.format(route.finishTime)}${System.lineSeparator()}at ${route.finishTime.hour}:${route.finishTime.minute}"
@@ -206,7 +223,10 @@ class MainActivity : ComponentActivity() {
                     .show()
             }
             buttonsPair.addView(deleteButton)
+
+            constraintSet.applyTo(suspectedRoutesView)
         }
+
     }
 
     fun addedNewSuspectedRouteCallback() {
