@@ -75,7 +75,7 @@
         android:id="@+id/hintButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:backgroundTint="#134563"
+        android:backgroundTint="#86D4EC"
         android:drawableTop="@drawable/hintbutton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

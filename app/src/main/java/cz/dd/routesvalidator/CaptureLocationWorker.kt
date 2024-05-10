@@ -22,6 +22,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
+
 private const val LOCATION_CAPTURE_TAG = "LOCATION_CAPTURE_TAG"
 
 class CaptureLocationWorker(private val context: Context, workerParams: WorkerParameters) :
@@ -84,11 +85,13 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
 //        val c1 = Coordinate(40.689361, -74.044705, 20000)
 //        val c2 = Coordinate(40.689426, -74.044542, 300000)
 //        val d = Coordinate(40.703996, -74.064266, 4000000)
-//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1), LocalDateTime.ofEpochSecond(b.epoch, 0, ZoneOffset.UTC)), context)
-//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2), LocalDateTime.ofEpochSecond(c1.epoch, 0, ZoneOffset.UTC)), context)
-//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d), LocalDateTime.ofEpochSecond(a.epoch, 0, ZoneOffset.UTC)), context)
-//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d, c1, c2, d), LocalDateTime.ofEpochSecond(d.epoch, 0, ZoneOffset.UTC)), context)
-//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d, c1, c2, d, c1), LocalDateTime.ofEpochSecond(b.epoch, 0, ZoneOffset.UTC)), context)
+//        val minDay = LocalDate.of(1970, 1, 1).toEpochDay()
+//        val maxDay = LocalDate.of(2015, 12, 31).toEpochDay()
+//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1), LocalDateTime.ofEpochSecond(ThreadLocalRandom.current().nextLong(minDay, maxDay), 0, ZoneOffset.UTC)), context)
+//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2), LocalDateTime.ofEpochSecond(ThreadLocalRandom.current().nextLong(minDay, maxDay), 0, ZoneOffset.UTC)), context)
+//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d), LocalDateTime.ofEpochSecond(ThreadLocalRandom.current().nextLong(minDay, maxDay), 0, ZoneOffset.UTC)), context)
+//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d, c1, c2, d), LocalDateTime.ofEpochSecond(ThreadLocalRandom.current().nextLong(minDay, maxDay), 0, ZoneOffset.UTC)), context)
+//        appendRoute(SUSPECTED_ROUTES_FILE_NAME, Route(a, b, listOf(c1, c2, d, c1, c2, d, c1), LocalDateTime.ofEpochSecond(ThreadLocalRandom.current().nextLong(minDay, maxDay), 0, ZoneOffset.UTC)), context)
 //        locationCapturingManager!!.mainActivity?.runOnUiThread { locationCapturingManager!!.mainActivity?.addedNewSuspectedRouteCallback() }
 
 
