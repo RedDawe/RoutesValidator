@@ -9,6 +9,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build.VERSION
 import android.os.Bundle
@@ -17,10 +20,11 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Switch
 import androidx.activity.ComponentActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -170,16 +174,16 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun reloadSuspectedRoutes() {
-        val suspectedRoutesView = findViewById<LinearLayout>(R.id.suspectedRoutes)
-        suspectedRoutesView.removeAllViews()
-
         val suspectedRoutes = loadRoutes(SUSPECTED_ROUTES_FILE_NAME, this)
-        for (route in suspectedRoutes) {
-            val buttonsPair = LinearLayout(this)
-            buttonsPair.orientation = LinearLayout.HORIZONTAL
-            suspectedRoutesView.addView(buttonsPair)
 
+        val suspectedRoutesView = findViewById<ConstraintLayout>(R.id.suspectedRoutes)
+        suspectedRoutesView.removeAllViews()
+        val suspectedRoutesConstraintSet = ConstraintSet()
+
+        var topConstraint: Button? = null
+        for (route in suspectedRoutes) {
             val openMapsButton = Button(this)
+            openMapsButton.id = View.generateViewId()
             openMapsButton.text = "Route ending on:${System.lineSeparator()}${dateFormatter.format(route.finishTime)}${System.lineSeparator()}at ${route.finishTime.hour}:${route.finishTime.minute}"
             openMapsButton.setOnClickListener {
                 LocationCapturingManager.restore(this@MainActivity)
@@ -189,9 +193,15 @@ class MainActivity : ComponentActivity() {
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 startActivity(mapIntent)
             }
-            buttonsPair.addView(openMapsButton)
+            openMapsButton.layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            openMapsButton.background.colorFilter = BlendModeColorFilter(Color.parseColor("#80e883"), BlendMode.MULTIPLY)
+            suspectedRoutesView.addView(openMapsButton)
 
             val deleteButton = ImageButton(this)
+            deleteButton.id = View.generateViewId()
             deleteButton.setBackgroundResource(R.drawable.delete)
             deleteButton.setOnClickListener {
                 AlertDialog.Builder(this)
@@ -199,21 +209,38 @@ class MainActivity : ComponentActivity() {
                     .setMessage("Do you really want to delete this route?")
                     .setPositiveButton("Yes") { _, _ ->
                         deleteMatchingRoutes(SUSPECTED_ROUTES_FILE_NAME, route, this)
-                        suspectedRoutesView.removeView(buttonsPair)
+                        reloadSuspectedRoutes()
                     }
                     .setNegativeButton("No") { _, _ -> }
                     .create()
                     .show()
             }
-            buttonsPair.addView(deleteButton)
+            suspectedRoutesView.addView(deleteButton)
+
+            suspectedRoutesConstraintSet.clone(suspectedRoutesView)
+            suspectedRoutesConstraintSet.connect(openMapsButton.id, ConstraintSet.LEFT, suspectedRoutesView.id, ConstraintSet.LEFT, 10)
+            suspectedRoutesConstraintSet.connect(openMapsButton.id, ConstraintSet.RIGHT, deleteButton.id, ConstraintSet.LEFT, 10)
+            suspectedRoutesConstraintSet.connect(deleteButton.id, ConstraintSet.RIGHT, suspectedRoutesView.id, ConstraintSet.RIGHT, 10)
+
+            if (topConstraint == null) {
+                suspectedRoutesConstraintSet.connect(openMapsButton.id, ConstraintSet.TOP, suspectedRoutesView.id, ConstraintSet.TOP, 10)
+                suspectedRoutesConstraintSet.connect(deleteButton.id, ConstraintSet.TOP, suspectedRoutesView.id, ConstraintSet.TOP, 10)
+            } else {
+                suspectedRoutesConstraintSet.connect(openMapsButton.id, ConstraintSet.TOP, topConstraint.id, ConstraintSet.BOTTOM, 10)
+                suspectedRoutesConstraintSet.connect(deleteButton.id, ConstraintSet.TOP, topConstraint.id, ConstraintSet.BOTTOM, 10)
+            }
+            topConstraint = openMapsButton
+
+            suspectedRoutesConstraintSet.applyTo(suspectedRoutesView)
         }
+
     }
 
     fun addedNewSuspectedRouteCallback() {
         reloadSuspectedRoutes()
 
         val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // TODO: which?
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
@@ -288,7 +315,7 @@ class MainActivity : ComponentActivity() {
         LocationCapturingManager.flushChanges(this@MainActivity)
 
         val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // TODO: which?
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 

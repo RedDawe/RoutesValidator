@@ -1,6 +1,7 @@
 package cz.dd.routesvalidator
 
 import android.content.Context
+import android.util.Log
 import cz.dd.routesvalidator.datamodel.Coordinate
 import cz.dd.routesvalidator.datamodel.Route
 import java.time.LocalDateTime
@@ -70,18 +71,28 @@ fun loadRoutes(fileName: String, context: Context): List<Route> {
         val valueList = line.trim().split(",")
         val waypoints = mutableListOf<Coordinate>()
 
-        for (i in 7 until valueList.size - 1 step 3) {
-            waypoints.add(Coordinate(valueList[i].toDouble(), valueList[i + 1].toDouble(), valueList[i + 2].toLong()))
-        }
+        try {
+            for (i in 7 until valueList.size - 1 step 3) {
+                waypoints.add(
+                    Coordinate(
+                        valueList[i].toDouble(),
+                        valueList[i + 1].toDouble(),
+                        valueList[i + 2].toLong()
+                    )
+                )
+            }
 
-        routes.add(
-            Route(
-                Coordinate(valueList[0].toDouble(), valueList[1].toDouble(), valueList[2].toLong()),
-                Coordinate(valueList[3].toDouble(), valueList[4].toDouble(), valueList[5].toLong()),
-                waypoints,
-                LocalDateTime.parse(valueList[6])
+            routes.add(
+                Route(
+                    Coordinate(valueList[0].toDouble(), valueList[1].toDouble(), valueList[2].toLong()),
+                    Coordinate(valueList[3].toDouble(), valueList[4].toDouble(), valueList[5].toLong()),
+                    waypoints,
+                    LocalDateTime.parse(valueList[6])
+                )
             )
-        )
+        } catch (e: Exception) {
+            Log.e("RoutesUtils", "Error while parsing route: $line")
+        }
     }
 
     return routes

@@ -47,7 +47,8 @@
         android:id="@+id/notShortestRoutesLabel"
         android:layout_width="0dp"
         android:layout_height="30dp"
-        android:text=" Identified shortcuts:"
+        android:text="Identified shortcuts"
+        android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -65,19 +66,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/notShortestRoutesLabel">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/suspectedRoutes"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-        </LinearLayout>
+            android:layout_height="wrap_content"/>
     </ScrollView>
 
     <Button
         android:id="@+id/hintButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:backgroundTint="#86D4EC"
         android:drawableTop="@drawable/hintbutton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
