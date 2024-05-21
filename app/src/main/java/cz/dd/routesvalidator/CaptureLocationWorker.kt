@@ -79,7 +79,8 @@ class CaptureLocationWorker(private val context: Context, workerParams: WorkerPa
 
     @SuppressLint("MissingPermission")
     private fun captureLocation() {
-        // TODO: Remove debugging code
+//        Uncomment to test the app without the need of moving
+
 //        val a = Coordinate(38.8976, -77.0366, 0)
 //        val b = Coordinate(39.9496, -75.1503, 1000)
 //        val c1 = Coordinate(40.689361, -74.044705, 20000)
