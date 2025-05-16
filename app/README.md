@@ -1,0 +1,1 @@
+https://is.muni.cz/auth/th/d47zr/Bakalarska_prace.pdf
